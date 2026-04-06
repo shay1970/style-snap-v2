@@ -1,0 +1,8 @@
+{
+  "name": "style-snap",
+  "version": "1.0.0",
+  "description": "Style Snap - AI clothing identifier",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.37.0"
+  }
+}
