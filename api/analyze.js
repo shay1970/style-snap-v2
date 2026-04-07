@@ -14,16 +14,16 @@ module.exports = async function handler(req, res) {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
-      messages: [
-        { role: 'user', content: [
+      messages: [{
+        role: 'user',
+        content: [
           { type: 'image', source: { type: 'base64', media_type: mimeType || 'image/jpeg', data: image } },
-          { type: 'text', text: 'Return ONLY a raw JSON array of clothing items. No markdown, no explanation. Each item: {"type":"Hebrew name","cat":"tops|bottoms|footwear|accessories|outerwear","color":"English","hex":"#xxxxxx","brand":"Unknown","style":"Casual","gender":"יוניסקס","conf":0.9}' }
-        ]},
-        { role: 'assistant', content: '[' }
-      ]
+          { type: 'text', text: 'Analyze clothing in this image. Respond with ONLY a JSON array (no markdown, no text). Start with [ end with ]. Each item: {"type":"שם עברי","cat":"tops|bottoms|footwear|accessories|outerwear","color":"English","hex":"#hex","brand":"brand or Unknown","style":"Casual|Sporty|Classic","gender":"גברים|נשים|יוניסקס","conf":0.9}' }
+        ]
+      }]
     });
-    const rawText = response.content[0].text.trim();
-    const text = '[' + rawText;
+    const text = response.content[0].text.trim();
+    console.log('Claude response:', text.substring(0, 200));
     const match = text.match(/\[\s\S]*\]/);
     if (!match) throw new Error('No JSON array in response');
     const items = JSON.parse(match[0]);
