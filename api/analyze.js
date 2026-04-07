@@ -18,15 +18,18 @@ module.exports = async function handler(req, res) {
         role: 'user',
         content: [
           { type: 'image', source: { type: 'base64', media_type: mimeType || 'image/jpeg', data: image } },
-          { type: 'text', text: 'Analyze clothing in this image. Respond with ONLY a JSON array (no markdown, no text). Start with [ end with ]. Each item: {"type":"שם עברי","cat":"tops|bottoms|footwear|accessories|outerwear","color":"English","hex":"#hex","brand":"brand or Unknown","style":"Casual|Sporty|Classic","gender":"גברים|נשים|יוניסקס","conf":0.9}' }
+          { type: 'text', text: 'Analyze clothing in this image. Respond with ONLY a JSON array (no markdown, no explanation). Start with [ and end with ]. Each item: {"type":"שם עברי","cat":"tops|bottoms|footwear|accessories|outerwear","color":"English","hex":"#hex","brand":"brand or Unknown","style":"Casual|Sporty|Classic","gender":"גברים|נשים|יוניסקס","conf":0.9}' }
         ]
       }]
     });
     const text = response.content[0].text.trim();
     console.log('Claude response:', text.substring(0, 200));
-    const match = text.match(/\[\s\S]*\]/);
-    if (!match) throw new Error('No JSON array in response');
-    const items = JSON.parse(match[0]);
+    const jsonStart = text.indexOf('[');
+    const jsonEnd = text.lastIndexOf(']');
+    if (jsonStart === -1 || jsonEnd <= jsonStart) {
+      throw new Error('No JSON array in response: ' + text.substring(0, 100));
+    }
+    const items = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
     const validCats = new Set(['tops','bottoms','footwear','accessories','outerwear']);
     const sanitized = items.map((item, i) => ({
       id: i+1, type: item.type||'פריט לבוש',
