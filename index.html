@@ -447,12 +447,12 @@ body{
 <div class="screen" id="s-snap-upload">
   <div class="hdr"><button class="back" onclick="goHome()">←</button><div><h1>Outfit Snap</h1><p>צלם בגד או אאוטפיט שלם</p></div></div>
   <div class="scr-body" style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:32px 24px;">
-    <input type="file" id="snapCameraFile" accept="image/*" capture="environment" onchange="handleSnap(event)" style="display:none"/>
-    <input type="file" id="snapGalleryFile" accept="image/*" onchange="handleSnap(event)" style="display:none"/>
-    <button onclick="document.getElementById('snapCameraFile').click()" style="width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+    <input type="file" id="snapCameraFile" accept="image/*" capture="environment" style="display:none"/>
+    <input type="file" id="snapGalleryFile" accept="image/*" style="display:none"/>
+    <button onclick="var ci=document.getElementById('snapCameraFile');ci.value='';ci.click()" style="width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
       📷 צלם עכשיו
     </button>
-    <button onclick="document.getElementById('snapGalleryFile').click()" style="width:100%;padding:16px;background:#fff;color:var(--text,#1a1a1a);border:1.5px solid var(--border,#e0e0e0);border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+    <button onclick="var gi=document.getElementById('snapGalleryFile');gi.value='';gi.click()" style="width:100%;padding:16px;background:#fff;color:var(--text,#1a1a1a);border:1.5px solid var(--border,#e0e0e0);border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
       🖼️ בחר מהגלריה
     </button>
   </div>
@@ -640,7 +640,7 @@ function setImg(imgId,phId,url,emoji){
 // ══════════════════════════════
 // SNAP FLOW
 // ══════════════════════════════
-const snapItems=[
+let snapItems=[
   {id:1,type:'חולצת טי',cat:'tops',color:'Navy Blue',hex:'#1e3a8a',brand:'Nike',style:'Casual',gender:'גברים',conf:.95},
   {id:2,type:"ג'ינס",cat:'bottoms',color:'Dark Indigo',hex:'#312e81',brand:"Levi's",style:'Classic',gender:'גברים',conf:.91},
   {id:3,type:'סניקרס',cat:'footwear',color:'White',hex:'#f9fafb',brand:'Adidas',style:'Sport',gender:'יוניסקס',conf:.88},
@@ -687,28 +687,52 @@ const snapProds={
   3:{featured:[{name:'Adidas Stan Smith',store:'Adidas',price:369,emoji:'⚽',bg:'#f0fdf4'},{name:'Nike Air Force 1',store:'Nike',price:449,emoji:'🏃',bg:'#eff6ff',sp:true}],more:[{name:'Classic Leather',store:'Reebok',price:289,e:'🏋️',bg:'#fff'},{name:'Chuck Taylor',store:'Converse',price:249,e:'⭐',bg:'#f9f9f9'},{name:'Old Skool',store:'Vans',price:269,e:'🛹',bg:'#fff'},{name:'Suede Classic',store:'Puma',price:299,e:'🐆',bg:'#faf5ff'},{name:'Fresh Foam',store:'NB',price:339,e:'🔵',bg:'#eff6ff'},{name:'Gel-Lite',store:'Asics',price:389,e:'🏃',bg:'#f9f9f9'}]},
 };
 let snapImgUrl=null;
-function handleSnap(e){ const f=e.target.files[0]; if(!f) return; snapImgUrl=URL.createObjectURL(f); startSnapScan(true); }
-function runSnapMock(){ snapImgUrl=null; startSnapScan(false); }
-async function startSnapScan(useRealApi){
+
+(function(){
+  window.addEventListener('load',function(){
+    var cam=document.getElementById('snapCameraFile');
+    var gal=document.getElementById('snapGalleryFile');
+    if(cam) cam.addEventListener('change',handleSnap);
+    if(gal) gal.addEventListener('change',handleSnap);
+  });
+})();
+
+function handleSnap(e){
+  var f=e.target.files&&e.target.files[0];
+  if(!f) return;
+  e.target.value='';
+  snapImgUrl=URL.createObjectURL(f);
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var b64=ev.target.result.split(',')[1];
+    startSnapScan(b64,f.type||'image/jpeg');
+  };
+  reader.onerror=function(){ startSnapScan(null,null); };
+  reader.readAsDataURL(f);
+}
+
+function runSnapMock(){ snapImgUrl=null; startSnapScan(null,null); }
+
+function startSnapScan(base64,mimeType){
   go('s-snap-scan');
   setImg('snapScanImg','snapScanPh',snapImgUrl,'👗');
-  const scanPromise=new Promise(resolve=>runScan(['ss1','ss2','ss3'],['ss1i','ss2i','ss3i'],resolve));
-  if(useRealApi && snapImgUrl){
-    try{
-      const [items]=await Promise.all([analyzeImage(snapImgUrl),scanPromise]);
-      currentSnapItems=items.length>0?items:snapItems;
-    }catch(err){
-      console.warn('AI analysis failed, using mock:',err.message);
-      await scanPromise;
-      currentSnapItems=snapItems;
+  var animDone=false,apiDone=false,apiItems=null;
+  function tryFinish(){
+    if(!animDone||!apiDone) return;
+    if(apiItems&&apiItems.length>0){
+      snapItems=apiItems.map(function(item,i){ return Object.assign({},item,{id:i+1}); });
     }
-  }else{
-    await scanPromise;
-    currentSnapItems=snapItems;
+    showSnapDetected(); go('s-snap-detected');
   }
-  showSnapDetected();
-  go('s-snap-detected');
+  runScan(['ss1','ss2','ss3'],['ss1i','ss2i','ss3i'],function(){ animDone=true; tryFinish(); });
+  if(base64){
+    fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:base64,mimeType:mimeType})})
+    .then(function(r){ return r.json(); })
+    .then(function(data){ apiItems=data.items||null; apiDone=true; tryFinish(); })
+    .catch(function(){ apiDone=true; tryFinish(); });
+  } else { apiDone=true; }
 }
+
 function showSnapDetected(){
   setImg('snapThumbImg','snapThumbPh',snapImgUrl,'👗');
   document.getElementById('snapItemCount').textContent=currentSnapItems.length+' פריטים';
