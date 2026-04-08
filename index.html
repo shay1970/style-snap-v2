@@ -702,13 +702,19 @@ function handleSnap(e){
   if(!f) return;
   e.target.value='';
   snapImgUrl=URL.createObjectURL(f);
-  var reader=new FileReader();
-  reader.onload=function(ev){
-    var b64=ev.target.result.split(',')[1];
-    startSnapScan(b64,f.type||'image/jpeg');
+  // Resize to max 1024px to stay under Vercel's 4.5MB body limit
+  var img=new Image();
+  img.onload=function(){
+    var MAX=1024, w=img.width, h=img.height;
+    if(w>MAX||h>MAX){ var s=Math.min(MAX/w,MAX/h); w=Math.round(w*s); h=Math.round(h*s); }
+    var canvas=document.createElement('canvas');
+    canvas.width=w; canvas.height=h;
+    canvas.getContext('2d').drawImage(img,0,0,w,h);
+    var b64=canvas.toDataURL('image/jpeg',0.85).split(',')[1];
+    startSnapScan(b64,'image/jpeg');
   };
-  reader.onerror=function(){ startSnapScan(null,null); };
-  reader.readAsDataURL(f);
+  img.onerror=function(){ startSnapScan(null,null); };
+  img.src=snapImgUrl;
 }
 
 function runSnapMock(){ snapImgUrl=null; startSnapScan(null,null); }
