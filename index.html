@@ -14,34 +14,6 @@
   --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
   --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
   --purple:#9333ea;--purple-bg:#faf5ff;--purple-border:#e9d5ff;
-}h
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:#d1d5db;display:flex;justify-content:center;
-  padding:20px 0 40px;min-height:100vh;
-}
-.phone{
-  width:390px;background:var(--bg);border-radius:44px;
-  overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25);
-  display:flex;flex-direction:column;position:relative;min-height:844px;
-}
-
-/* ── Screens ── */
-<html lang="he" dir="ltr">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Style Snap</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --bg:#f9fafb;--card:#fff;--border:#e5e7eb;--text:#111827;--muted:#6b7280;
-  --radius:16px;--shadow:0 1px 4px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.12);
-  --primary:#6366f1;--primary-light:#eef2ff;--primary-dark:#4338ca;
-  --gold:#f59e0b;--gold-light:#fffbeb;
-  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
-  --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
-  --purple:#9333ea;--purple-bg:#faf5ff;--purple-border:#e9d5ff;
 }
 body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -188,8 +160,9 @@ body{
 .step.active{border-color:#c4b5fd;background:#faf5ff;color:var(--primary-dark);}
 .step.done{border-color:#a7f3d0;background:#ecfdf5;color:#065f46;}
 .spinner{
-  width:14px;height:14px;border:2px solid #c4b5fd;border-top-color:var(--primary);
-  border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;
+  width:16px;height:16px;border:2.5px solid #e0e7ff;border-top-color:var(--primary);
+  border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0;
+  box-shadow:0 0 6px rgba(99,102,241,.2);
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -387,6 +360,55 @@ body{
 .litem-price{font-size:13px;font-weight:800;flex-shrink:0;}
 .insp-note{background:#fffbeb;border:1px solid #fde68a;border-radius:11px;padding:10px 13px;font-size:11px;color:#92400e;line-height:1.5;margin-bottom:12px;display:flex;gap:8px;}
 .buy-btn{width:100%;padding:14px;font-size:14px;font-weight:800;border:none;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+
+/* ── Skeleton Loader ── */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skel{
+  background:linear-gradient(90deg,#ececec 25%,#d8d8d8 50%,#ececec 75%);
+  background-size:400px 100%;animation:shimmer 1.4s infinite;border-radius:8px;
+}
+.skel-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.skel-img{height:120px;}
+.skel-line{height:11px;margin:10px 12px 6px;}
+.skel-line.s60{width:60%;}
+.skel-line.s40{width:40%;}
+.skel-btn{height:32px;margin:0 12px 12px;border-radius:10px;}
+.skel-mini{background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;}
+.skel-mini-img{height:72px;}
+.skel-mini-line{height:8px;margin:6px 8px 4px;}
+.skel-mini-line.s50{width:50%;}
+
+/* ── Sale badge ── */
+.sale-badge{
+  position:absolute;top:8px;right:8px;
+  background:#ef4444;color:#fff;
+  font-size:9px;font-weight:800;padding:2px 7px;border-radius:6px;
+  letter-spacing:.3px;
+}
+
+/* ── Store logo pill ── */
+.store-pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--muted);}
+.store-pill .s-ico{font-size:11px;}
+
+/* ── Product card micro-animations ── */
+@keyframes fadeInCard{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.pcard{animation:fadeInCard .32s ease both;}
+.pmini{animation:fadeInCard .32s ease both;}
+.pcard:active{transform:scale(.97)!important;transition:transform .1s;}
+.pmini:active{transform:scale(.97);transition:transform .1s;}
+
+/* ── Empty state ── */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:48px 24px;gap:16px;text-align:center;
+}
+.empty-ico{font-size:56px;}
+.empty-msg{font-size:15px;font-weight:600;color:var(--text);line-height:1.5;max-width:240px;}
+.empty-btn{
+  background:var(--primary);color:#fff;font-size:14px;font-weight:700;
+  padding:12px 28px;border-radius:100px;border:none;cursor:pointer;
+  box-shadow:0 4px 12px rgba(99,102,241,.35);margin-top:8px;
+}
 </style>
 </head>
 <body>
@@ -447,17 +469,28 @@ body{
 <div class="screen" id="s-snap-upload">
   <div class="hdr"><button class="back" onclick="goHome()">←</button><div><h1>Outfit Snap</h1><p>צלם בגד או אאוטפיט שלם</p></div></div>
   <div class="scr-body" style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:32px 24px;">
-    <input type="file" id="snapCameraFile" accept="image/*" capture="environment" style="display:none"/>
-    <input type="file" id="snapGalleryFile" accept="image/*" style="display:none"/>
-    <button onclick="var ci=document.getElementById('snapCameraFile');ci.value='';ci.click()" style="width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+    <!-- Hidden input: camera capture (rear) -->
+    <input type="file" id="snapCameraFile" accept="image/*" capture="environment" onchange="handleSnap(event)" style="display:none"/>
+    <!-- Hidden input: gallery picker -->
+    <input type="file" id="snapGalleryFile" accept="image/*" onchange="handleSnap(event)" style="display:none"/>
+
+    <!-- Primary button: camera -->
+    <button
+      onclick="document.getElementById('snapCameraFile').click()"
+      style="width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
       📷 צלם עכשיו
     </button>
-    <button onclick="var gi=document.getElementById('snapGalleryFile');gi.value='';gi.click()" style="width:100%;padding:16px;background:#fff;color:var(--text,#1a1a1a);border:1.5px solid var(--border,#e0e0e0);border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+
+    <!-- Secondary button: gallery -->
+    <button
+      onclick="document.getElementById('snapGalleryFile').click()"
+      style="width:100%;padding:16px;background:#fff;color:var(--text,#1a1a1a);border:1.5px solid var(--border,#e0e0e0);border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
       🖼️ בחר מהגלריה
     </button>
   </div>
 </div>
 
+<!-- ═══════════════════════ SNAP: SCANNING ═══════════════════════ -->
 <div class="screen" id="s-snap-scan">
   <div class="hdr"><button class="back" onclick="go('s-snap-upload')">←</button><div><h1>מנתח</h1><p>AI מזהה פריטים...</p></div></div>
   <div class="scan-wrap">
@@ -640,7 +673,7 @@ function setImg(imgId,phId,url,emoji){
 // ══════════════════════════════
 // SNAP FLOW
 // ══════════════════════════════
-let snapItems=[
+const snapItems=[
   {id:1,type:'חולצת טי',cat:'tops',color:'Navy Blue',hex:'#1e3a8a',brand:'Nike',style:'Casual',gender:'גברים',conf:.95},
   {id:2,type:"ג'ינס",cat:'bottoms',color:'Dark Indigo',hex:'#312e81',brand:"Levi's",style:'Classic',gender:'גברים',conf:.91},
   {id:3,type:'סניקרס',cat:'footwear',color:'White',hex:'#f9fafb',brand:'Adidas',style:'Sport',gender:'יוניסקס',conf:.88},
@@ -657,18 +690,23 @@ const genericProds={
 
 // ── Real Claude API call ──────────────────────
 async function analyzeImage(imgUrl){
-  const resp=await fetch(imgUrl);
-  const blob=await resp.blob();
-  const mimeType=blob.type||'image/jpeg';
+  // Load image and resize to max 1024px to stay under Vercel's 4.5MB body limit
   return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onloadend=async()=>{
-      const base64=reader.result.split(',')[1];
+    const img=new Image();
+    img.onload=async function(){
       try{
+        const MAX=1024;
+        let w=img.width, h=img.height;
+        if(w>MAX||h>MAX){ const s=Math.min(MAX/w,MAX/h); w=Math.round(w*s); h=Math.round(h*s); }
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        const dataUrl=canvas.toDataURL('image/jpeg',0.85);
+        const base64=dataUrl.split(',')[1];
         const apiResp=await fetch('/api/analyze',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({image:base64,mimeType})
+          body:JSON.stringify({image:base64,mimeType:'image/jpeg'})
         });
         if(!apiResp.ok) throw new Error('שגיאת API: '+apiResp.status);
         const data=await apiResp.json();
@@ -676,8 +714,8 @@ async function analyzeImage(imgUrl){
         resolve(data.items||[]);
       }catch(err){ reject(err); }
     };
-    reader.onerror=reject;
-    reader.readAsDataURL(blob);
+    img.onerror=reject;
+    img.src=imgUrl;
   });
 }
 const catIcons={tops:'👕',bottoms:'👖',footwear:'👟',accessories:'⌚',default:'👔'};
@@ -687,91 +725,106 @@ const snapProds={
   3:{featured:[{name:'Adidas Stan Smith',store:'Adidas',price:369,emoji:'⚽',bg:'#f0fdf4'},{name:'Nike Air Force 1',store:'Nike',price:449,emoji:'🏃',bg:'#eff6ff',sp:true}],more:[{name:'Classic Leather',store:'Reebok',price:289,e:'🏋️',bg:'#fff'},{name:'Chuck Taylor',store:'Converse',price:249,e:'⭐',bg:'#f9f9f9'},{name:'Old Skool',store:'Vans',price:269,e:'🛹',bg:'#fff'},{name:'Suede Classic',store:'Puma',price:299,e:'🐆',bg:'#faf5ff'},{name:'Fresh Foam',store:'NB',price:339,e:'🔵',bg:'#eff6ff'},{name:'Gel-Lite',store:'Asics',price:389,e:'🏃',bg:'#f9f9f9'}]},
 };
 let snapImgUrl=null;
-
-(function(){
-  window.addEventListener('load',function(){
-    var cam=document.getElementById('snapCameraFile');
-    var gal=document.getElementById('snapGalleryFile');
-    if(cam) cam.addEventListener('change',handleSnap);
-    if(gal) gal.addEventListener('change',handleSnap);
-  });
-})();
-
+let _snapLock=false;
 function handleSnap(e){
-  var f=e.target.files&&e.target.files[0];
-  if(!f) return;
-  e.target.value='';
+  const f=e.target.files[0]; if(!f) return;
+  if(_snapLock) return; // prevent double-fire from multiple file inputs
+  _snapLock=true;
+  // reset other file input so it doesn't re-fire
+  const otherId = e.target.id==='snapCameraFile'?'snapGalleryFile':'snapCameraFile';
+  const other=document.getElementById(otherId); if(other) other.value='';
   snapImgUrl=URL.createObjectURL(f);
-  // Resize to max 1024px to stay under Vercel's 4.5MB body limit
-  var img=new Image();
-  img.onload=function(){
-    var MAX=1024, w=img.width, h=img.height;
-    if(w>MAX||h>MAX){ var s=Math.min(MAX/w,MAX/h); w=Math.round(w*s); h=Math.round(h*s); }
-    var canvas=document.createElement('canvas');
-    canvas.width=w; canvas.height=h;
-    canvas.getContext('2d').drawImage(img,0,0,w,h);
-    var b64=canvas.toDataURL('image/jpeg',0.85).split(',')[1];
-    startSnapScan(b64,'image/jpeg');
-  };
-  img.onerror=function(){ startSnapScan(null,null); };
-  img.src=snapImgUrl;
+  startSnapScan(true);
 }
-
-function runSnapMock(){ snapImgUrl=null; startSnapScan(null,null); }
-
-function startSnapScan(base64,mimeType){
+function runSnapMock(){ snapImgUrl=null; startSnapScan(false); }
+async function startSnapScan(useRealApi){
   go('s-snap-scan');
   setImg('snapScanImg','snapScanPh',snapImgUrl,'👗');
-  var animDone=false,apiDone=false,apiItems=null;
-  function tryFinish(){
-    if(!animDone||!apiDone) return;
-    if(apiItems&&apiItems.length>0){
-      snapItems=apiItems.map(function(item,i){ return Object.assign({},item,{id:i+1}); });
+  const scanPromise=new Promise(resolve=>runScan(['ss1','ss2','ss3'],['ss1i','ss2i','ss3i'],resolve));
+  if(useRealApi && snapImgUrl){
+    try{
+      const [items]=await Promise.all([analyzeImage(snapImgUrl),scanPromise]);
+      console.log('AI items received:',items);
+      currentSnapItems=items.length>0?items:snapItems;
+    }catch(err){
+      console.warn('AI analysis failed, using mock:',err.message);
+      await scanPromise;
+      currentSnapItems=snapItems;
     }
-    showSnapDetected(); go('s-snap-detected');
+  }else{
+    await scanPromise;
+    currentSnapItems=snapItems;
   }
-  runScan(['ss1','ss2','ss3'],['ss1i','ss2i','ss3i'],function(){ animDone=true; tryFinish(); });
-  if(base64){
-    fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:base64,mimeType:mimeType})})
-    .then(function(r){ return r.json(); })
-    .then(function(data){ apiItems=data.items||null; apiDone=true; tryFinish(); })
-    .catch(function(){ apiDone=true; tryFinish(); });
-  } else { apiDone=true; }
+  _snapLock=false;
+  showSnapDetected();
+  go('s-snap-detected');
 }
-
 function showSnapDetected(){
   setImg('snapThumbImg','snapThumbPh',snapImgUrl,'👗');
   document.getElementById('snapItemCount').textContent=currentSnapItems.length+' פריטים';
   const list=document.getElementById('snapItemList'); list.innerHTML='';
-  currentSnapItems.forEach(item=>{
+  if(currentSnapItems.length===0){
+    list.innerHTML=`<div class="empty-state">
+      <div class="empty-ico">🤷</div>
+      <div class="empty-msg">לא זיהינו בגדים בתמונה 🤷<br>נסה תמונה עם תאורה טובה יותר</div>
+      <button class="empty-btn" onclick="go('s-snap-upload')">נסה שוב</button>
+    </div>`;
+    return;
+  }
+  currentSnapItems.forEach((item,idx)=>{
     const ico=catIcons[item.cat]||catIcons.default, pct=Math.round((item.conf||0.85)*100);
     const cls=pct>=85?'cg':'cy';
     const meta=[item.color,item.brand,item.style,item.gender].filter(Boolean).join(' · ');
-    list.innerHTML+=`<div class="item-row" onclick="showSnapProducts(${item.id})">
+    const el=document.createElement('div');
+    el.className='item-row';
+    el.style.cssText=`animation:fadeInCard .3s ease both;animation-delay:${idx*100}ms;opacity:0`;
+    el.onclick=()=>showSnapProducts(item.id);
+    el.innerHTML=`
       <div class="swatch-wrap"><div class="swatch" style="background:${item.hex||'#888'}"></div><span class="cat-ico">${ico}</span></div>
       <div class="item-info"><div class="item-name-row"><span class="iname">${item.type}</span><span class="cbadge ${cls}">${pct}%</span></div><div class="imeta">${meta}</div></div>
-      <div class="shop-ico">🛍️</div><span style="color:var(--muted);font-size:18px">›</span>
-    </div>`;
+      <div class="shop-ico">🛍️</div><span style="color:var(--muted);font-size:18px">›</span>`;
+    list.appendChild(el);
   });
 }
+const _storeEmoji={'Nike':'⚡','Adidas':'🔷',"Levi's":'🔵','Zara':'🏷️','H&M':'🛍️','Uniqlo':'🟥','ASOS':'💜','Converse':'⭐','Vans':'🛹','Pull&Bear':'🐻','Mango':'🥭','Gap':'🏔️','Nordstrom':'🏢','UA':'🛡️','Reebok':'🏋️','Puma':'🐆','Stradivarius':'🌸','NB':'🔵','Asics':'🏃','Bershka':'🔥',"J.Crew":'🎀','Old Navy':'⚓','BR':'🍌','AE':'🦅','ALDO':'👞','Casio':'⌚','New Era':'🧢','Nike ACG':'⚡','Arc\'teryx':'🏔️','Supreme':'🔴','Off-White':'⬜','Decathlon':'🟢'};
+function _shopUrl(name,store){return 'https://www.google.com/search?tbm=shop&q='+encodeURIComponent(name+' '+store);}
 function showSnapProducts(id){
   const item=currentSnapItems.find(i=>i.id===id);
   if(!item) return;
-  // Use predefined products for mock items (id 1-3), otherwise use generic by category
   const data=snapProds[id]||(genericProds[item.cat]||genericProds.tops);
   document.getElementById('snapProdSub').textContent=[item.type,item.color,item.brand].filter(Boolean).join(' · ');
-  document.getElementById('snapTopGrid').innerHTML=data.featured.map((p,i)=>`
-    <div class="pcard">
-      <div class="pcard-lbl">${p.sp?'<span class="spons">ממומן</span>':''}${i===0?'⭐ הכי מתאים':'🔄 דומה'}</div>
-      <div class="pimg" style="background:${p.bg}">${p.emoji}</div>
-      <div class="pinfo"><div class="pname">${p.name}</div><div class="pstore">${p.store}</div>
-      <div><span class="pprice">₪${p.price}</span>${p.orig?`<span class="porig">₪${p.orig}</span>`:''}</div></div>
-      <button class="pbtn" onclick="alert('פותח ${p.name}...')">צפה במוצר ↗</button>
-    </div>`).join('');
-  document.getElementById('snapMoreGrid').innerHTML=data.more.map(p=>`
-    <div class="pmini"><div class="pmini-img" style="background:${p.bg}">${p.e}</div>
-    <div class="pmini-body"><div class="pmini-name">${p.name}</div><div class="pmini-store">${p.store}</div><div class="pmini-price">₪${p.price}</div></div></div>`).join('');
+  // Show skeleton while "loading"
+  document.getElementById('snapTopGrid').innerHTML=`
+    <div class="skel-card"><div class="skel skel-img"></div><div class="skel skel-line"></div><div class="skel skel-line s60"></div><div class="skel skel-btn"></div></div>
+    <div class="skel-card"><div class="skel skel-img"></div><div class="skel skel-line"></div><div class="skel skel-line s60"></div><div class="skel skel-btn"></div></div>`;
+  document.getElementById('snapMoreGrid').innerHTML=Array(6).fill(0).map(()=>`<div class="skel-mini"><div class="skel skel-mini-img"></div><div class="skel skel-mini-line"></div><div class="skel skel-mini-line s50"></div></div>`).join('');
   go('s-snap-products');
+  // Render real cards after brief skeleton moment
+  setTimeout(()=>{
+    document.getElementById('snapTopGrid').innerHTML=data.featured.map((p,i)=>{
+      const disc=p.orig?Math.round((1-p.price/p.orig)*100):null;
+      const sico=_storeEmoji[p.store]||'🏪';
+      const url=_shopUrl(p.name,p.store);
+      return `<div class="pcard" style="animation-delay:${i*100}ms;position:relative">
+        ${disc?`<span class="sale-badge">-${disc}% הנחה</span>`:''}
+        <div class="pcard-lbl">${p.sp?'<span class="spons">ממומן</span>':''}${i===0?'⭐ הכי מתאים':'🔄 דומה'}</div>
+        <div class="pimg" style="background:${p.bg}">${p.emoji}</div>
+        <div class="pinfo">
+          <div class="pname">${p.name}</div>
+          <div class="pstore store-pill"><span class="s-ico">${sico}</span>${p.store}</div>
+          <div><span class="pprice">₪${p.price}</span>${p.orig?`<span class="porig">₪${p.orig}</span>`:''}</div>
+        </div>
+        <button class="pbtn" onclick="window.open('${url}','_blank')">לחץ לרכישה ↗</button>
+      </div>`;
+    }).join('');
+    document.getElementById('snapMoreGrid').innerHTML=data.more.map((p,i)=>{
+      const url=_shopUrl(p.name,p.store);
+      return `<div class="pmini" style="animation-delay:${(i+2)*100}ms;cursor:pointer" onclick="window.open('${url}','_blank')">
+        <div class="pmini-img" style="background:${p.bg}">${p.e}</div>
+        <div class="pmini-body"><div class="pmini-name">${p.name}</div><div class="pmini-store">${p.store}</div><div class="pmini-price">₪${p.price}</div></div>
+      </div>`;
+    }).join('');
+  },420);
 }
 
 // ══════════════════════════════
