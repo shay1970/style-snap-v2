@@ -787,6 +787,16 @@ function showSnapDetected(){
   });
 }
 const _storeEmoji={'Nike':'⚡','Adidas':'🔷',"Levi's":'🔵','Zara':'🏷️','H&M':'🛍️','Uniqlo':'🟥','ASOS':'💜','Converse':'⭐','Vans':'🛹','Pull&Bear':'🐻','Mango':'🥭','Gap':'🏔️','Nordstrom':'🏢','UA':'🛡️','Reebok':'🏋️','Puma':'🐆','Stradivarius':'🌸','NB':'🔵','Asics':'🏃','Bershka':'🔥',"J.Crew":'🎀','Old Navy':'⚓','BR':'🍌','AE':'🦅','ALDO':'👞','Casio':'⌚','New Era':'🧢','Nike ACG':'⚡','Arc\'teryx':'🏔️','Supreme':'🔴','Off-White':'⬜','Decathlon':'🟢'};
+// ── Real product images by category (Unsplash CDN, no API key needed) ──
+const _catImgs={
+  tops:['1521572163474-6864f9cf17ab','1583743814966-8936f5b7be1a','1576566588028-4147f3842f27','1434389677669-e08b4cac3105','1503341504253-dff4815485f1','1562157873-818bc0726f68','1594938298870-57977c7f2fc1'],
+  bottoms:['1542272604-787c3835535d','1541099649105-f69ad21f3246','1604176354204-9268737828e4','1555689502-c4b22d76c5e0','1591213954555-09ba0c7cf9e8'],
+  footwear:['1542291026-7eec264c27ff','1595950653106-6c9ebd614d3a','1560769629-975ec94e6a86','1600269452121-4f2416e55c28'],
+  accessories:['1523779917675-e6ce9b3e686f','1553062407-98eeb64c6a62','1548036161-e7a154543e74'],
+  outerwear:['1551028719-00167b16eac5','1591047139829-d91aecb6caea','1544022613-e87ca75a784a','1606902965571-56a9e95c5d80'],
+};
+function _hash(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))&0xffff;return h;}
+function _pimg(name,cat){const a=_catImgs[cat]||_catImgs.tops;return`https://images.unsplash.com/photo-${a[_hash(name)%a.length]}?w=400&h=400&fit=crop&auto=format&q=80`;}
 function _shopUrl(name,store){return 'https://www.google.com/search?tbm=shop&q='+encodeURIComponent(name+' '+store);}
 function showSnapProducts(id){
   const item=currentSnapItems.find(i=>i.id===id);
@@ -808,7 +818,7 @@ function showSnapProducts(id){
       return `<div class="pcard" style="animation-delay:${i*100}ms;position:relative">
         ${disc?`<span class="sale-badge">-${disc}% הנחה</span>`:''}
         <div class="pcard-lbl">${p.sp?'<span class="spons">ממומן</span>':''}${i===0?'⭐ הכי מתאים':'🔄 דומה'}</div>
-        <div class="pimg" style="background:${p.bg}">${p.emoji}</div>
+        <div class="pimg" style="background:${p.bg};padding:0;overflow:hidden"><img src="${_pimg(p.name,item.cat)}" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" onerror="this.parentNode.style.fontSize='36px';this.parentNode.textContent='${p.emoji}'" /></div>
         <div class="pinfo">
           <div class="pname">${p.name}</div>
           <div class="pstore store-pill"><span class="s-ico">${sico}</span>${p.store}</div>
@@ -820,7 +830,7 @@ function showSnapProducts(id){
     document.getElementById('snapMoreGrid').innerHTML=data.more.map((p,i)=>{
       const url=_shopUrl(p.name,p.store);
       return `<div class="pmini" style="animation-delay:${(i+2)*100}ms;cursor:pointer" onclick="window.open('${url}','_blank')">
-        <div class="pmini-img" style="background:${p.bg}">${p.e}</div>
+        <div class="pmini-img" style="background:${p.bg};padding:0;overflow:hidden"><img src="${_pimg(p.name,item.cat)}" style="width:100%;height:72px;object-fit:cover;display:block" loading="lazy" onerror="this.parentNode.style.fontSize='26px';this.parentNode.textContent='${p.e}'" /></div>
         <div class="pmini-body"><div class="pmini-name">${p.name}</div><div class="pmini-store">${p.store}</div><div class="pmini-price">₪${p.price}</div></div>
       </div>`;
     }).join('');
