@@ -3,185 +3,142 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Style Snap</title>
+<title>Style Snap v3</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#f9fafb;--card:#fff;--border:#e5e7eb;--text:#111827;--muted:#6b7280;
-  --radius:16px;--shadow:0 1px 4px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.12);
+  --bg:#f5f5f7;--card:#fff;--border:#e5e7eb;--text:#111827;--muted:#6b7280;
+  --radius:16px;--shadow:0 1px 4px rgba(0,0,0,.07);--shadow-md:0 6px 20px rgba(0,0,0,.11);
   --primary:#6366f1;--primary-light:#eef2ff;--primary-dark:#4338ca;
   --gold:#f59e0b;--gold-light:#fffbeb;
   --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
   --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
   --purple:#9333ea;--purple-bg:#faf5ff;--purple-border:#e9d5ff;
+  --pink:#ec4899;
 }
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:#d1d5db;display:flex;justify-content:center;
-  padding:20px 0 40px;min-height:100vh;
-}
-.phone{
-  width:390px;background:var(--bg);border-radius:44px;
-  overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25);
-  display:flex;flex-direction:column;position:relative;min-height:844px;
-}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#c9cdd4;display:flex;justify-content:center;padding:24px 0 48px;min-height:100vh;}
+.phone{width:390px;background:var(--bg);border-radius:48px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.28);display:flex;flex-direction:column;position:relative;min-height:844px;}
+
+/* ── Dynamic Island ── */
+.di{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:126px;height:34px;background:#000;border-radius:20px;z-index:100;}
 
 /* ── Screens ── */
-.screen{display:none;flex-direction:column;flex:1;}
+.screen{display:none;flex-direction:column;flex:1;padding-top:0;}
 .screen.active{display:flex;}
+.scr-body{flex:1;overflow-y:auto;padding-bottom:88px;scrollbar-width:none;}
+.scr-body::-webkit-scrollbar{display:none;}
 
 /* ── Bottom nav ── */
 .bottom-nav{
-  height:68px;background:var(--card);border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-around;
-  padding:0 8px 8px;flex-shrink:0;position:sticky;bottom:0;z-index:50;
+  height:76px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(0,0,0,.08);
+  display:flex;align-items:flex-start;justify-content:space-around;
+  padding:10px 8px 0;flex-shrink:0;position:sticky;bottom:0;z-index:50;
 }
-.nav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  gap:3px;padding:8px 4px;cursor:pointer;border-radius:12px;
-  transition:background .15s;border:none;background:transparent;
-}
-.nav-item:hover{background:var(--bg);}
-.nav-icon{font-size:20px;line-height:1;}
-.nav-label{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.3px;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;cursor:pointer;border-radius:14px;transition:all .18s;border:none;background:transparent;}
+.nav-item:active{background:rgba(0,0,0,.05);}
+.nav-icon-wrap{width:46px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:14px;transition:all .2s;}
+.nav-item.active .nav-icon-wrap{background:var(--primary-light);}
+.nav-icon{font-size:19px;line-height:1;}
+.nav-label{font-size:9px;font-weight:600;color:var(--muted);letter-spacing:.2px;}
 .nav-item.active .nav-label{color:var(--primary);}
-.nav-dot{
-  width:4px;height:4px;border-radius:50%;background:var(--primary);
-  display:none;
-}
-.nav-item.active .nav-dot{display:block;}
 
 /* ── Shared header ── */
-.hdr{
-  background:rgba(249,250,251,.95);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);padding:16px 20px;
-  display:flex;align-items:center;gap:12px;flex-shrink:0;
-  position:sticky;top:0;z-index:40;
-}
-.back{
-  width:38px;height:38px;border-radius:50%;border:none;
-  background:transparent;cursor:pointer;font-size:20px;
-  color:var(--text);display:flex;align-items:center;justify-content:center;
-}
-.back:hover{background:var(--border);}
+.hdr{background:rgba(245,245,247,.93);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06);padding:56px 20px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:sticky;top:0;z-index:40;}
+.hdr-simple{padding-top:56px;}
+.back{width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.06);cursor:pointer;font-size:16px;color:var(--text);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .hdr h1{font-size:17px;font-weight:700;color:var(--text);}
-.hdr p{font-size:12px;color:var(--muted);margin-top:1px;}
+.hdr p{font-size:11px;color:var(--muted);margin-top:1px;}
+.hdr-right{margin-left:auto;display:flex;gap:8px;}
+.hdr-btn{width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.06);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
 
-/* scrollable body within a screen */
-.scr-body{flex:1;overflow-y:auto;padding-bottom:20px;}
+/* ════════════════════ HOME ════════════════════ */
+.home-top{padding:56px 20px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.home-greeting{font-size:13px;color:var(--muted);font-weight:500;}
+.home-title-row{font-size:26px;font-weight:800;color:var(--text);}
+.home-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#ec4899);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 
-/* ════════════════════════════════
-   HOME
-════════════════════════════════ */
-.home-hero{
-  background:linear-gradient(160deg,#312e81,#6366f1 55%,#a78bfa);
-  padding:40px 28px 32px;display:flex;flex-direction:column;align-items:center;
-}
-.home-logo{font-size:56px;margin-bottom:12px;}
-.home-title{font-size:28px;font-weight:800;color:#fff;text-align:center;line-height:1.1;margin-bottom:8px;}
-.home-sub{font-size:13px;color:rgba(255,255,255,.75);text-align:center;line-height:1.5;max-width:260px;}
+.hero-banner{margin:16px;border-radius:24px;background:linear-gradient(135deg,#1e1b4b 0%,#312e81 45%,#6366f1 100%);padding:24px 20px;position:relative;overflow:hidden;}
+.hero-banner::after{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:rgba(167,139,250,.15);border-radius:50%;}
+.hero-tag{background:rgba(255,255,255,.15);border-radius:100px;padding:4px 12px;font-size:10px;font-weight:700;color:rgba(255,255,255,.8);display:inline-block;margin-bottom:10px;}
+.hero-h{font-size:20px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:6px;}
+.hero-h span{color:#a5b4fc;}
+.hero-sub{font-size:12px;color:rgba(255,255,255,.65);line-height:1.5;margin-bottom:16px;}
+.hero-cta{background:#fff;color:var(--primary);font-size:13px;font-weight:700;padding:10px 20px;border-radius:100px;border:none;cursor:pointer;}
 
-.feat-cards{padding:20px 16px;display:flex;flex-direction:column;gap:12px;}
-.feat-card{
-  background:var(--card);border:1.5px solid var(--border);border-radius:20px;
-  padding:18px;display:flex;align-items:center;gap:16px;cursor:pointer;
-  box-shadow:var(--shadow);transition:all .15s;
-}
-.feat-card:active{transform:scale(.98);}
-.feat-card:hover{box-shadow:var(--shadow-md);border-color:#c4b5fd;}
-.feat-icon-wrap{
-  width:52px;height:52px;border-radius:14px;
-  display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;
-}
-.feat-info{flex:1;}
-.feat-name{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px;}
-.feat-desc{font-size:12px;color:var(--muted);line-height:1.4;}
-.feat-arrow{font-size:20px;color:var(--muted);}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 20px;margin-bottom:12px;}
+.section-title{font-size:15px;font-weight:700;color:var(--text);}
+.section-link{font-size:12px;font-weight:600;color:var(--primary);cursor:pointer;}
 
-/* ════════════════════════════════
-   SNAP FLOW (main)
-════════════════════════════════ */
-.upload-drop{
-  margin:20px;border:2px dashed #c4b5fd;border-radius:20px;
-  padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;
-  background:#faf5ff;cursor:pointer;transition:all .2s;
-}
-.upload-drop:hover{border-color:var(--primary);background:var(--primary-light);}
-.upl-icon{font-size:44px;}
+.quick-row{display:flex;gap:10px;padding:0 16px;margin-bottom:20px;overflow-x:auto;scrollbar-width:none;}
+.quick-row::-webkit-scrollbar{display:none;}
+.qcard{flex-shrink:0;width:100px;background:var(--card);border-radius:18px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;box-shadow:var(--shadow);transition:all .15s;border:1.5px solid transparent;}
+.qcard:active{transform:scale(.95);}
+.qcard.selected{border-color:var(--primary);background:var(--primary-light);}
+.qcard-icon{font-size:28px;}
+.qcard-name{font-size:11px;font-weight:700;color:var(--text);text-align:center;}
+.qcard-sub{font-size:9px;color:var(--muted);text-align:center;}
+
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:20px;}
+.stat-card{background:var(--card);border-radius:18px;padding:16px;box-shadow:var(--shadow);}
+.stat-val{font-size:26px;font-weight:800;color:var(--text);line-height:1;}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;}
+.stat-icon{font-size:20px;margin-bottom:6px;}
+
+.recent-scroll{display:flex;gap:10px;padding:0 16px;overflow-x:auto;scrollbar-width:none;margin-bottom:24px;}
+.recent-scroll::-webkit-scrollbar{display:none;}
+.rcard{flex-shrink:0;width:110px;background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;}
+.rcard-img{height:90px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+.rcard-info{padding:8px 10px 10px;}
+.rcard-name{font-size:10px;font-weight:700;color:var(--text);line-height:1.2;}
+.rcard-price{font-size:11px;font-weight:800;color:var(--primary);margin-top:3px;}
+
+/* ════════════════════ SNAP FLOW ════════════════════ */
+.upload-area{margin:16px;border:2px dashed #c4b5fd;border-radius:22px;padding:36px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;background:#faf5ff;cursor:pointer;transition:all .2s;}
+.upload-area:hover{border-color:var(--primary);background:var(--primary-light);}
+.upload-area:active{transform:scale(.98);}
+.upl-icon{font-size:48px;}
 .upl-title{font-size:15px;font-weight:700;color:var(--text);}
 .upl-sub{font-size:12px;color:var(--muted);text-align:center;line-height:1.5;}
-.upl-btn{
-  background:var(--primary);color:#fff;font-size:14px;font-weight:700;
-  padding:13px 28px;border-radius:100px;border:none;cursor:pointer;
-  box-shadow:0 4px 12px rgba(99,102,241,.35);
-}
-.mock-btn{
-  width:calc(100% - 40px);margin:0 20px;padding:13px;
-  border-radius:14px;border:1.5px solid var(--border);background:var(--card);
-  font-size:14px;font-weight:600;color:var(--text);cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
 
-/* scanning */
-.scan-wrap{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:32px 24px;gap:20px;text-align:center;
-}
-.scan-img-box{
-  width:200px;height:260px;border-radius:20px;overflow:hidden;
-  position:relative;box-shadow:var(--shadow-md);
-}
+.action-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 32px);margin:0 16px 10px;padding:15px;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;}
+.action-btn:active{transform:scale(.98);}
+.action-btn.primary{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(99,102,241,.35);}
+.action-btn.secondary{background:var(--card);color:var(--text);border:1.5px solid var(--border);}
+
+/* scan */
+.scan-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px;gap:18px;text-align:center;}
+.scan-img-box{width:210px;height:270px;border-radius:22px;overflow:hidden;position:relative;box-shadow:var(--shadow-md);}
 .scan-img-box img{width:100%;height:100%;object-fit:cover;display:none;}
 .scan-img-box img.show{display:block;}
-.scan-ph{
-  width:100%;height:100%;display:flex;align-items:center;
-  justify-content:center;font-size:64px;
-}
-.scan-line{
-  position:absolute;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,#6366f1,#a78bfa,#6366f1,transparent);
-  box-shadow:0 0 12px #6366f1;animation:scanDown 1.8s ease-in-out infinite;
-}
+.scan-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;background:linear-gradient(135deg,#e0e7ff,#dbeafe);}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#6366f1,#a78bfa,#6366f1,transparent);box-shadow:0 0 14px #6366f1;animation:scanDown 1.8s ease-in-out infinite;}
 @keyframes scanDown{0%{top:0;opacity:1}80%{top:95%;opacity:1}100%{top:95%;opacity:0}}
 .scan-corners{position:absolute;inset:0;pointer-events:none;}
-.sc{position:absolute;width:20px;height:20px;border-color:#6366f1;border-style:solid;}
-.sc.tl{top:8px;left:8px;border-width:2px 0 0 2px;border-radius:4px 0 0 0;}
-.sc.tr{top:8px;right:8px;border-width:2px 2px 0 0;border-radius:0 4px 0 0;}
-.sc.bl{bottom:8px;left:8px;border-width:0 0 2px 2px;border-radius:0 0 0 4px;}
-.sc.br{bottom:8px;right:8px;border-width:0 2px 2px 0;border-radius:0 0 4px 0;}
+.sc{position:absolute;width:22px;height:22px;border-color:#6366f1;border-style:solid;}
+.sc.tl{top:8px;left:8px;border-width:2.5px 0 0 2.5px;border-radius:4px 0 0 0;}
+.sc.tr{top:8px;right:8px;border-width:2.5px 2.5px 0 0;border-radius:0 4px 0 0;}
+.sc.bl{bottom:8px;left:8px;border-width:0 0 2.5px 2.5px;border-radius:0 0 0 4px;}
+.sc.br{bottom:8px;right:8px;border-width:0 2.5px 2.5px 0;border-radius:0 0 4px 0;}
 .scan-lbl{font-size:20px;font-weight:800;color:var(--text);}
 .scan-sub2{font-size:13px;color:var(--muted);}
 .step-list{display:flex;flex-direction:column;gap:8px;width:100%;}
-.step{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;
-  padding:10px 14px;font-size:13px;color:var(--muted);
-  display:flex;align-items:center;gap:10px;transition:all .4s;
-}
+.step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:10px;transition:all .4s;}
 .step.active{border-color:#c4b5fd;background:#faf5ff;color:var(--primary-dark);}
 .step.done{border-color:#a7f3d0;background:#ecfdf5;color:#065f46;}
-.spinner{
-  width:16px;height:16px;border:2.5px solid #e0e7ff;border-top-color:var(--primary);
-  border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0;
-  box-shadow:0 0 6px rgba(99,102,241,.2);
-}
+.spinner{width:14px;height:14px;border:2px solid #c4b5fd;border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* detected items */
-.thumb-wrap{
-  margin:16px;height:180px;border-radius:20px;overflow:hidden;
-  position:relative;box-shadow:var(--shadow);flex-shrink:0;
-}
+/* detected */
+.thumb-wrap{margin:16px;height:180px;border-radius:20px;overflow:hidden;position:relative;box-shadow:var(--shadow);flex-shrink:0;}
 .thumb-wrap img{width:100%;height:100%;object-fit:cover;display:none;}
 .thumb-wrap img.show{display:block;}
 .thumb-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:56px;background:linear-gradient(135deg,#e0e7ff,#dbeafe);}
-.thumb-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.35),transparent 60%);}
+.thumb-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.4),transparent 60%);}
 .thumb-lbl{position:absolute;bottom:10px;left:14px;color:#fff;font-size:12px;font-weight:600;}
 .sec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:0 16px 10px;}
-.item-row{
-  margin:0 16px 10px;background:var(--card);border:1.5px solid var(--border);
-  border-radius:var(--radius);padding:14px;display:flex;align-items:center;
-  gap:12px;cursor:pointer;transition:all .15s;
-}
+
+.item-row{margin:0 16px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow);}
 .item-row:active{transform:scale(.98);}
 .item-row:hover{box-shadow:var(--shadow-md);border-color:#bfdbfe;}
 .swatch-wrap{position:relative;flex-shrink:0;}
@@ -191,69 +148,50 @@ body{
 .item-name-row{display:flex;align-items:center;gap:7px;margin-bottom:3px;}
 .iname{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cbadge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;}
-.cg{background:#dcfce7;color:#16a34a;} .cy{background:#fef9c3;color:#a16207;}
+.cg{background:#dcfce7;color:#16a34a;}.cy{background:#fef9c3;color:#a16207;}
 .imeta{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .shop-ico{width:30px;height:30px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
 
-/* product results */
+/* products */
 .prod-hdr-info h1{font-size:17px;font-weight:700;color:var(--text);}
 .prod-hdr-info p{font-size:12px;color:var(--muted);margin-top:1px;}
 .top-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px;}
 .pcard{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
 .pcard-lbl{font-size:11px;font-weight:700;color:var(--muted);padding:10px 12px 4px;}
-.pimg{width:100%;height:120px;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.pimg{width:100%;height:120px;display:flex;align-items:center;justify-content:center;font-size:40px;}
 .pinfo{padding:8px 12px 10px;}
 .pname{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.3;}
 .pstore{font-size:10px;color:var(--muted);margin-bottom:5px;}
-.pprice{font-size:13px;font-weight:800;color:var(--text);}
+.pprice{font-size:14px;font-weight:800;color:var(--text);}
 .porig{font-size:10px;color:var(--muted);text-decoration:line-through;margin-left:4px;}
 .spons{float:right;background:#f3f4f6;color:var(--muted);font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;}
-.pbtn{
-  display:block;width:calc(100% - 24px);margin:0 12px 12px;
-  padding:8px;background:var(--primary);color:#fff;
-  font-size:11px;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-align:center;
-}
-.more-lbl{font-size:14px;font-weight:700;color:var(--text);margin:0 16px 10px;}
+.pbtn{display:block;width:calc(100% - 24px);margin:0 12px 12px;padding:8px;background:var(--primary);color:#fff;font-size:11px;font-weight:700;border:none;border-radius:10px;cursor:pointer;text-align:center;}
+.more-lbl{font-size:14px;font-weight:700;color:var(--text);margin:4px 16px 10px;}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 16px;}
-.pmini{background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
-.pmini-img{width:100%;height:72px;display:flex;align-items:center;justify-content:center;font-size:26px;}
+.pmini{background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:.1s;}
+.pmini:active{transform:scale(.97);}
+.pmini-img{width:100%;height:76px;display:flex;align-items:center;justify-content:center;font-size:28px;}
 .pmini-body{padding:6px 8px 8px;}
 .pmini-name{font-size:9px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:2px;}
 .pmini-store{font-size:9px;color:var(--muted);}
 .pmini-price{font-size:11px;font-weight:800;color:var(--primary);margin-top:3px;}
+.wish-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;position:absolute;top:8px;right:8px;z-index:5;}
 
-/* ════════════════════════════════
-   SOCIAL SNAP FLOW
-════════════════════════════════ */
-.social-hero{
-  background:linear-gradient(160deg,#0f172a,#1e293b 50%,#334155);
-  padding:32px 28px;display:flex;flex-direction:column;align-items:center;
-}
-.social-badge{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:100px;padding:6px 16px;font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:16px;}
-.social-icon{font-size:56px;margin-bottom:12px;}
-.social-title{font-size:26px;font-weight:800;color:#fff;text-align:center;line-height:1.1;margin-bottom:8px;}
-.social-sub{font-size:13px;color:rgba(255,255,255,.65);text-align:center;line-height:1.5;max-width:260px;margin-bottom:24px;}
-.social-cta{background:#fbbf24;color:#1a1a1a;font-size:14px;font-weight:800;padding:14px 28px;border-radius:100px;border:none;cursor:pointer;width:100%;max-width:260px;box-shadow:0 8px 24px rgba(251,191,36,.3);}
+/* ════════════════════ SOCIAL FLOW ════════════════════ */
 .src-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px;}
-.src-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s;}
+.src-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow);}
 .src-card:hover{border-color:var(--primary);background:var(--primary-light);}
 .src-card:active{transform:scale(.97);}
-.src-ico{font-size:26px;}
+.src-ico{font-size:28px;}
 .src-name{font-size:12px;font-weight:700;color:var(--text);}
 .src-sub{font-size:10px;color:var(--muted);text-align:center;}
 
-/* tagged results */
 .tag-wrap{margin:12px 16px;border-radius:20px;overflow:hidden;position:relative;box-shadow:var(--shadow-md);flex-shrink:0;}
 .tag-wrap img{width:100%;height:280px;object-fit:cover;display:none;}
 .tag-wrap img.show{display:block;}
 .tag-ph{width:100%;height:280px;display:flex;align-items:center;justify-content:center;font-size:80px;background:linear-gradient(135deg,#e0e7ff,#ddd6fe);}
-.dot{
-  position:absolute;width:28px;height:28px;border-radius:50%;
-  background:var(--primary);border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);
-  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;
-  color:#fff;cursor:pointer;transition:transform .15s;z-index:5;
-}
-.dot:hover,.dot.active{transform:scale(1.2);background:#ec4899;}
+.dot{position:absolute;width:28px;height:28px;border-radius:50%;background:var(--primary);border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;cursor:pointer;transition:transform .15s;z-index:5;}
+.dot:hover,.dot.active{transform:scale(1.2);background:var(--pink);}
 .dot::after{content:'';position:absolute;inset:-6px;border-radius:50%;background:rgba(99,102,241,.2);animation:pulse 1.5s ease infinite;}
 .dot.active::after{background:rgba(236,72,153,.25);}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.4);opacity:0}}
@@ -263,7 +201,7 @@ body{
 .chip.active{border-color:var(--primary);background:var(--primary-light);}
 .chip-color{width:26px;height:26px;border-radius:7px;border:1px solid rgba(0,0,0,.08);flex-shrink:0;}
 .chip-num{width:18px;height:18px;border-radius:50%;background:var(--primary);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.chip.active .chip-num{background:#ec4899;}
+.chip.active .chip-num{background:var(--pink);}
 .chip-info{flex:1;min-width:0;}
 .chip-name{font-size:11px;font-weight:700;color:var(--text);}
 .chip-sub{font-size:9px;color:var(--muted);}
@@ -279,38 +217,16 @@ body{
 .prd-nm{font-size:9px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:2px;}
 .prd-st{font-size:9px;color:var(--muted);}
 .prd-pr{font-size:11px;font-weight:800;color:var(--primary);margin-top:3px;}
-.stl-btn{
-  width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),#ec4899);
-  color:#fff;font-size:13px;font-weight:800;border:none;border-radius:14px;cursor:pointer;
-  margin-top:14px;box-shadow:0 4px 14px rgba(99,102,241,.3);
-}
+.stl-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--primary),var(--pink));color:#fff;font-size:13px;font-weight:800;border:none;border-radius:14px;cursor:pointer;margin-top:14px;box-shadow:0 4px 14px rgba(99,102,241,.3);}
 
-/* ════════════════════════════════
-   STYLE TWIN FLOW
-════════════════════════════════ */
-.twin-hero{
-  background:linear-gradient(160deg,#0f172a,#1e293b 40%,#334155);
-  padding:36px 28px;display:flex;flex-direction:column;align-items:center;
-}
-.twin-badge{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:100px;padding:6px 16px;font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:16px;}
-.twin-icon{font-size:60px;margin-bottom:12px;}
-.twin-title{font-size:26px;font-weight:800;color:#fff;text-align:center;line-height:1.1;margin-bottom:8px;}
-.twin-title span{color:#fbbf24;}
-.twin-sub{font-size:13px;color:rgba(255,255,255,.65);text-align:center;line-height:1.5;max-width:260px;margin-bottom:24px;}
-.twin-cta{background:#fbbf24;color:#1a1a1a;font-size:14px;font-weight:800;padding:14px 28px;border-radius:100px;border:none;cursor:pointer;width:100%;max-width:260px;}
-.budgets-row{display:flex;gap:8px;margin-top:20px;}
-.btag{border-radius:100px;padding:5px 13px;font-size:11px;font-weight:700;border:1px solid;}
-.btag.b{background:rgba(22,163,74,.15);color:#4ade80;border-color:rgba(74,222,128,.3);}
-.btag.m{background:rgba(37,99,235,.15);color:#60a5fa;border-color:rgba(96,165,250,.3);}
-.btag.p{background:rgba(147,51,234,.15);color:#c084fc;border-color:rgba(192,132,252,.3);}
+/* ════════════════════ TWIN FLOW ════════════════════ */
 .style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px;}
-.sty-ex{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s;}
+.sty-ex{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow);}
 .sty-ex:hover{border-color:#fcd34d;background:#fffbeb;}
 .sty-ex:active{transform:scale(.97);}
-.sty-ico{font-size:24px;}
+.sty-ico{font-size:26px;}
 .sty-name{font-size:11px;font-weight:700;color:var(--text);text-align:center;}
 
-/* analyzing */
 .anl-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;gap:18px;text-align:center;}
 .anl-img-rel{position:relative;}
 .anl-img-box{width:180px;height:230px;border-radius:20px;overflow:hidden;box-shadow:var(--shadow-md);}
@@ -324,12 +240,7 @@ body{
 .attr{background:#1e293b;color:#fbbf24;font-size:11px;font-weight:700;padding:4px 12px;border-radius:100px;opacity:0;transform:scale(.8);transition:opacity .3s,transform .3s;}
 .attr.show{opacity:1;transform:scale(1);}
 
-/* twin results */
-.id-card{
-  margin:14px 16px;border-radius:18px;overflow:hidden;
-  background:linear-gradient(135deg,#1e293b,#0f172a);padding:16px;
-  display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-md);
-}
+.id-card{margin:14px 16px;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#1e293b,#0f172a);padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-md);}
 .id-img{width:64px;height:64px;border-radius:12px;overflow:hidden;flex-shrink:0;border:2px solid #fbbf24;}
 .id-img img{width:100%;height:100%;object-fit:cover;display:none;}
 .id-img img.show{display:block;}
@@ -361,146 +272,223 @@ body{
 .insp-note{background:#fffbeb;border:1px solid #fde68a;border-radius:11px;padding:10px 13px;font-size:11px;color:#92400e;line-height:1.5;margin-bottom:12px;display:flex;gap:8px;}
 .buy-btn{width:100%;padding:14px;font-size:14px;font-weight:800;border:none;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
 
-/* ── Skeleton Loader ── */
-@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
-.skel{
-  background:linear-gradient(90deg,#ececec 25%,#d8d8d8 50%,#ececec 75%);
-  background-size:400px 100%;animation:shimmer 1.4s infinite;border-radius:8px;
-}
-.skel-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
-.skel-img{height:120px;}
-.skel-line{height:11px;margin:10px 12px 6px;}
-.skel-line.s60{width:60%;}
-.skel-line.s40{width:40%;}
-.skel-btn{height:32px;margin:0 12px 12px;border-radius:10px;}
-.skel-mini{background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;}
-.skel-mini-img{height:72px;}
-.skel-mini-line{height:8px;margin:6px 8px 4px;}
-.skel-mini-line.s50{width:50%;}
+/* ════════════════════ WARDROBE ════════════════════ */
+.wardrobe-hero{margin:16px;border-radius:22px;background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:20px;display:flex;align-items:center;gap:16px;}
+.wardrobe-stats{flex:1;}
+.w-stat-num{font-size:32px;font-weight:800;color:#fff;line-height:1;}
+.w-stat-lbl{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px;}
+.w-cats{display:flex;flex-direction:column;gap:6px;}
+.w-cat-row{display:flex;align-items:center;gap:8px;}
+.w-cat-dot{width:8px;height:8px;border-radius:50%;}
+.w-cat-lbl{font-size:10px;color:rgba(255,255,255,.7);flex:1;}
+.w-cat-num{font-size:10px;font-weight:700;color:rgba(255,255,255,.9);}
 
-/* ── Sale badge ── */
-.sale-badge{
-  position:absolute;top:8px;right:8px;
-  background:#ef4444;color:#fff;
-  font-size:9px;font-weight:800;padding:2px 7px;border-radius:6px;
-  letter-spacing:.3px;
-}
+.filter-tabs{display:flex;gap:8px;padding:0 16px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.ftab{flex-shrink:0;padding:6px 14px;border-radius:100px;border:1.5px solid var(--border);background:var(--card);font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
+.ftab.active{background:var(--primary);color:#fff;border-color:var(--primary);}
 
-/* ── Store logo pill ── */
-.store-pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--muted);}
-.store-pill .s-ico{font-size:11px;}
+.wardrobe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 16px;margin-bottom:20px;}
+.witem{background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:.15s;position:relative;}
+.witem:active{transform:scale(.97);}
+.witem-img{height:100px;display:flex;align-items:center;justify-content:center;font-size:32px;}
+.witem-info{padding:7px 9px 9px;}
+.witem-name{font-size:10px;font-weight:700;color:var(--text);line-height:1.2;}
+.witem-meta{font-size:9px;color:var(--muted);margin-top:2px;}
+.witem-badge{position:absolute;top:7px;right:7px;background:rgba(255,255,255,.9);border-radius:100px;padding:2px 7px;font-size:8px;font-weight:700;color:var(--primary);}
+.add-witem{background:var(--bg);border:2px dashed var(--border);border-radius:14px;height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:.15s;}
+.add-witem:active{transform:scale(.97);}
+.add-icon{font-size:24px;color:var(--muted);}
+.add-lbl{font-size:10px;font-weight:700;color:var(--muted);}
 
-/* ── Product card micro-animations ── */
-@keyframes fadeInCard{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.pcard{animation:fadeInCard .32s ease both;}
-.pmini{animation:fadeInCard .32s ease both;}
-.pcard:active{transform:scale(.97)!important;transition:transform .1s;}
-.pmini:active{transform:scale(.97);transition:transform .1s;}
+.outfit-section{padding:0 16px 20px;}
+.outfit-card{background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);border:1.5px solid var(--border);}
+.outfit-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.outfit-sub{font-size:11px;color:var(--muted);margin-bottom:12px;}
+.outfit-pieces{display:flex;gap:8px;margin-bottom:12px;}
+.outfit-piece{flex:1;background:var(--bg);border-radius:10px;height:70px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.outfit-action{width:100%;padding:11px;background:linear-gradient(135deg,var(--primary),#8b5cf6);color:#fff;font-size:12px;font-weight:700;border:none;border-radius:10px;cursor:pointer;}
 
-/* ── Empty state ── */
-.empty-state{
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:center;padding:48px 24px;gap:16px;text-align:center;
-}
-.empty-ico{font-size:56px;}
-.empty-msg{font-size:15px;font-weight:600;color:var(--text);line-height:1.5;max-width:240px;}
-.empty-btn{
-  background:var(--primary);color:#fff;font-size:14px;font-weight:700;
-  padding:12px 28px;border-radius:100px;border:none;cursor:pointer;
-  box-shadow:0 4px 12px rgba(99,102,241,.35);margin-top:8px;
-}
+/* ════════════════════ WISHLIST ════════════════════ */
+.wish-banner{margin:16px;border-radius:22px;background:linear-gradient(135deg,#be185d,#ec4899 60%,#f472b6);padding:20px;position:relative;overflow:hidden;}
+.wish-banner::after{content:'';position:absolute;bottom:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.1);border-radius:50%;}
+.wish-banner-h{font-size:18px;font-weight:800;color:#fff;margin-bottom:4px;}
+.wish-banner-sub{font-size:12px;color:rgba(255,255,255,.75);line-height:1.4;}
+.wish-banner-stat{font-size:28px;font-weight:800;color:#fff;margin-top:10px;}
+.wish-banner-stat-lbl{font-size:11px;color:rgba(255,255,255,.7);}
+
+.wish-list{display:flex;flex-direction:column;gap:10px;padding:0 16px 20px;}
+.wish-item{background:var(--card);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow);border:1.5px solid var(--border);}
+.wish-item-img{width:64px;height:64px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+.wish-item-info{flex:1;min-width:0;}
+.wish-item-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wish-item-store{font-size:11px;color:var(--muted);margin-top:2px;}
+.wish-price-row{display:flex;align-items:center;gap:8px;margin-top:6px;}
+.wish-price{font-size:15px;font-weight:800;color:var(--text);}
+.wish-price-orig{font-size:11px;color:var(--muted);text-decoration:line-through;}
+.wish-badge{background:#dcfce7;color:var(--green);font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;}
+.wish-badge.alert{background:#fee2e2;color:#dc2626;}
+.wish-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.wish-buy{background:var(--primary);color:#fff;font-size:10px;font-weight:700;padding:7px 12px;border-radius:8px;border:none;cursor:pointer;}
+.wish-remove{background:var(--bg);color:var(--muted);font-size:10px;font-weight:600;padding:7px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;}
+
+.price-track-banner{margin:0 16px 14px;border-radius:14px;background:#fffbeb;border:1px solid #fde68a;padding:12px 14px;display:flex;gap:10px;align-items:center;}
+.ptb-icon{font-size:24px;}
+.ptb-text{flex:1;}
+.ptb-h{font-size:12px;font-weight:700;color:#92400e;margin-bottom:2px;}
+.ptb-sub{font-size:10px;color:#a16207;}
+
+/* ════════════════════ TOAST ════════════════════ */
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:#1f2937;color:#fff;padding:10px 20px;border-radius:100px;font-size:13px;font-weight:600;z-index:200;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 <div class="phone">
+<div class="di"></div>
 
-<!-- ═══════════════════════ HOME ═══════════════════════ -->
+<!-- ════════════════ HOME ════════════════ -->
 <div class="screen active" id="s-home">
   <div class="scr-body">
-    <div class="home-hero">
-      <div class="home-logo">👗</div>
-      <h1 class="home-title">Style Snap</h1>
-      <p class="home-sub">זהה בגדים, מצא סגנון, בנה לוקים — הכל במקום אחד</p>
+    <div class="home-top">
+      <div>
+        <div class="home-greeting">שלום, שי 👋</div>
+        <div class="home-title-row">Style Snap</div>
+      </div>
+      <div class="home-avatar">👤</div>
     </div>
-    <div class="feat-cards">
-      <div class="feat-card" onclick="go('s-snap-upload')">
-        <div class="feat-icon-wrap" style="background:#eef2ff">📷</div>
-        <div class="feat-info">
-          <div class="feat-name">Outfit Snap</div>
-          <div class="feat-desc">צלם בגד וקבל מוצרים דומים לרכישה</div>
-        </div>
-        <div class="feat-arrow">›</div>
+
+    <div style="height:16px"></div>
+
+    <!-- Hero -->
+    <div class="hero-banner">
+      <div class="hero-tag">✨ AI Fashion</div>
+      <div class="hero-h">גלה כל בגד <span>בשנייה</span></div>
+      <div class="hero-sub">צלם, זהה, קנה. אפליקציית האופנה החכמה שלך.</div>
+      <button class="hero-cta" onclick="navTo('s-snap-upload','nav-snap')">📷 התחל Snap</button>
+    </div>
+
+    <!-- Quick actions -->
+    <div style="height:20px"></div>
+    <div class="section-hdr"><span class="section-title">פיצ'רים מהירים</span></div>
+    <div class="quick-row">
+      <div class="qcard" onclick="navTo('s-snap-upload','nav-snap')">
+        <div class="qcard-icon">📷</div>
+        <div class="qcard-name">Outfit Snap</div>
+        <div class="qcard-sub">זהה בגד</div>
       </div>
-      <div class="feat-card" onclick="go('s-social-upload')">
-        <div class="feat-icon-wrap" style="background:#fff7ed">📲</div>
-        <div class="feat-info">
-          <div class="feat-name">Social Snap</div>
-          <div class="feat-desc">ראית ברשת? העלה תמונה ומצא את הבגדים</div>
-        </div>
-        <div class="feat-arrow">›</div>
+      <div class="qcard" onclick="navTo('s-social-upload','nav-social')">
+        <div class="qcard-icon">📲</div>
+        <div class="qcard-name">Social Snap</div>
+        <div class="qcard-sub">מהרשת</div>
       </div>
-      <div class="feat-card" onclick="go('s-twin-select')">
-        <div class="feat-icon-wrap" style="background:#fffbeb">🪞</div>
-        <div class="feat-info">
-          <div class="feat-name">Style Twin</div>
-          <div class="feat-desc">זהה סגנון וקבל לוק שלם ב-3 תקציבים</div>
-        </div>
-        <div class="feat-arrow">›</div>
+      <div class="qcard" onclick="navTo('s-twin-select','nav-twin')">
+        <div class="qcard-icon">🪞</div>
+        <div class="qcard-name">Style Twin</div>
+        <div class="qcard-sub">3 תקציבים</div>
       </div>
+      <div class="qcard" onclick="navTo('s-wardrobe','nav-wardrobe')">
+        <div class="qcard-icon">👗</div>
+        <div class="qcard-name">ארון</div>
+        <div class="qcard-sub">12 פריטים</div>
+      </div>
+      <div class="qcard" onclick="navTo('s-wishlist','nav-wishlist')">
+        <div class="qcard-icon">❤️</div>
+        <div class="qcard-name">Wishlist</div>
+        <div class="qcard-sub">5 פריטים</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="section-hdr"><span class="section-title">הסיכום שלך</span></div>
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-icon">📷</div>
+        <div class="stat-val">24</div>
+        <div class="stat-lbl">Snaps השבוע</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-val">₪340</div>
+        <div class="stat-lbl">חסכת (מבצעים)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👗</div>
+        <div class="stat-val">12</div>
+        <div class="stat-lbl">פריטים בארון</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">❤️</div>
+        <div class="stat-val">5</div>
+        <div class="stat-lbl">ב-Wishlist</div>
+      </div>
+    </div>
+
+    <!-- Recent finds -->
+    <div class="section-hdr">
+      <span class="section-title">מצאת לאחרונה</span>
+      <span class="section-link">הכל</span>
+    </div>
+    <div class="recent-scroll">
+      <div class="rcard"><div class="rcard-img" style="background:#eff6ff">👕</div><div class="rcard-info"><div class="rcard-name">Nike Club Tee</div><div class="rcard-price">₪139</div></div></div>
+      <div class="rcard"><div class="rcard-img" style="background:#f0fdf4">👟</div><div class="rcard-info"><div class="rcard-name">Stan Smith</div><div class="rcard-price">₪369</div></div></div>
+      <div class="rcard"><div class="rcard-img" style="background:#faf5ff">👖</div><div class="rcard-info"><div class="rcard-name">Levi's 511</div><div class="rcard-price">₪269</div></div></div>
+      <div class="rcard"><div class="rcard-img" style="background:#fff7ed">🧥</div><div class="rcard-info"><div class="rcard-name">Blazer</div><div class="rcard-price">₪599</div></div></div>
     </div>
   </div>
+
+  <!-- Nav -->
   <div class="bottom-nav">
-    <button class="nav-item active" onclick="navTo('s-home','nav-home')">
-      <span class="nav-icon">🏠</span><span class="nav-label">בית</span><span class="nav-dot"></span>
+    <button class="nav-item active" id="nav-home" onclick="navTo('s-home','nav-home')">
+      <div class="nav-icon-wrap"><span class="nav-icon">🏠</span></div><span class="nav-label">בית</span>
     </button>
-    <button class="nav-item" onclick="navTo('s-snap-upload','nav-snap')">
-      <span class="nav-icon">📷</span><span class="nav-label">Snap</span><span class="nav-dot"></span>
+    <button class="nav-item" id="nav-snap" onclick="navTo('s-snap-upload','nav-snap')">
+      <div class="nav-icon-wrap"><span class="nav-icon">📷</span></div><span class="nav-label">Snap</span>
     </button>
-    <button class="nav-item" onclick="navTo('s-social-upload','nav-social')">
-      <span class="nav-icon">📲</span><span class="nav-label">Social</span><span class="nav-dot"></span>
+    <button class="nav-item" id="nav-social" onclick="navTo('s-social-upload','nav-social')">
+      <div class="nav-icon-wrap"><span class="nav-icon">📲</span></div><span class="nav-label">Social</span>
     </button>
-    <button class="nav-item" onclick="navTo('s-twin-select','nav-twin')">
-      <span class="nav-icon">🪞</span><span class="nav-label">Twin</span><span class="nav-dot"></span>
+    <button class="nav-item" id="nav-twin" onclick="navTo('s-twin-select','nav-twin')">
+      <div class="nav-icon-wrap"><span class="nav-icon">🪞</span></div><span class="nav-label">Twin</span>
+    </button>
+    <button class="nav-item" id="nav-wardrobe" onclick="navTo('s-wardrobe','nav-wardrobe')">
+      <div class="nav-icon-wrap"><span class="nav-icon">👗</span></div><span class="nav-label">ארון</span>
+    </button>
+    <button class="nav-item" id="nav-wishlist" onclick="navTo('s-wishlist','nav-wishlist')">
+      <div class="nav-icon-wrap"><span class="nav-icon">❤️</span></div><span class="nav-label">Wishlist</span>
     </button>
   </div>
 </div>
 
-<!-- ═══════════════════════ SNAP: UPLOAD ═══════════════════════ -->
+<!-- ════════════════ SNAP: UPLOAD ════════════════ -->
 <div class="screen" id="s-snap-upload">
-  <div class="hdr"><button class="back" onclick="goHome()">←</button><div><h1>Outfit Snap</h1><p>צלם בגד או אאוטפיט שלם</p></div></div>
-  <div class="scr-body" style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px;padding:32px 24px;">
-    <!-- Hidden input: camera capture (rear) -->
-    <input type="file" id="snapCameraFile" accept="image/*" capture="environment" onchange="handleSnap(event)" style="display:none"/>
-    <!-- Hidden input: gallery picker -->
-    <input type="file" id="snapGalleryFile" accept="image/*" onchange="handleSnap(event)" style="display:none"/>
-
-    <!-- Primary button: camera -->
-    <button
-      onclick="document.getElementById('snapCameraFile').click()"
-      style="width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-      📷 צלם עכשיו
-    </button>
-
-    <!-- Secondary button: gallery -->
-    <button
-      onclick="document.getElementById('snapGalleryFile').click()"
-      style="width:100%;padding:16px;background:#fff;color:var(--text,#1a1a1a);border:1.5px solid var(--border,#e0e0e0);border-radius:14px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
-      🖼️ בחר מהגלריה
-    </button>
+  <div class="hdr hdr-simple"><button class="back" onclick="goHome()">←</button><div><h1>Outfit Snap</h1><p>צלם בגד וזהה מיד</p></div></div>
+  <div class="scr-body" style="display:flex;flex-direction:column;padding:20px 0 0;">
+    <input type="file" id="snapCameraFile" accept="image/*" capture="environment" style="display:none"/>
+    <input type="file" id="snapGalleryFile" accept="image/*" style="display:none"/>
+    <div class="upload-area" onclick="document.getElementById('snapGalleryFile').click()">
+      <div class="upl-icon">👗</div>
+      <div class="upl-title">גרור או לחץ להעלאה</div>
+      <div class="upl-sub">JPG, PNG · מקסימום 20MB</div>
+    </div>
+    <button class="action-btn primary" onclick="document.getElementById('snapCameraFile').click()">📷 צלם עכשיו</button>
+    <button class="action-btn secondary" onclick="document.getElementById('snapGalleryFile').click()">🖼️ בחר מהגלריה</button>
+    <div style="text-align:center;padding:6px 0;"><span style="font-size:11px;color:var(--muted)">— או —</span></div>
+    <button class="action-btn secondary" onclick="runSnapMock()">🎯 הדמו (ללא תמונה)</button>
   </div>
 </div>
 
-<!-- ═══════════════════════ SNAP: SCANNING ═══════════════════════ -->
+<!-- ════════════════ SNAP: SCANNING ════════════════ -->
 <div class="screen" id="s-snap-scan">
-  <div class="hdr"><button class="back" onclick="go('s-snap-upload')">←</button><div><h1>מנתח</h1><p>AI מזהה פריטים...</p></div></div>
+  <div class="hdr hdr-simple"><button class="back" onclick="go('s-snap-upload')">←</button><div><h1>מנתח תמונה</h1><p>AI מזהה פריטים...</p></div></div>
   <div class="scan-wrap">
     <div class="scan-img-box">
       <img id="snapScanImg"/><div class="scan-ph" id="snapScanPh">👗</div>
       <div class="scan-line"></div>
       <div class="scan-corners"><div class="sc tl"></div><div class="sc tr"></div><div class="sc bl"></div><div class="sc br"></div></div>
     </div>
-    <div class="scan-lbl" id="snapScanLbl">סורק...</div>
-    <div class="scan-sub2" id="snapScanSub">AI מזהה פריטי לבוש</div>
+    <div class="scan-lbl">סורק...</div>
+    <div class="scan-sub2">AI מזהה פריטי לבוש</div>
     <div class="step-list">
       <div class="step" id="ss1"><span>🔎</span><span>זיהוי פריטי לבוש</span><span id="ss1i" style="margin-left:auto"></span></div>
       <div class="step" id="ss2"><span>🎨</span><span>ניתוח צבעים וסגנון</span><span id="ss2i" style="margin-left:auto"></span></div>
@@ -509,20 +497,20 @@ body{
   </div>
 </div>
 
-<!-- ═══════════════════════ SNAP: DETECTED ═══════════════════════ -->
+<!-- ════════════════ SNAP: DETECTED ════════════════ -->
 <div class="screen" id="s-snap-detected">
-  <div class="hdr"><button class="back" onclick="go('s-snap-upload')">←</button><div><h1>פריטים שזוהו</h1><p id="snapItemCount">3 פריטים</p></div></div>
+  <div class="hdr hdr-simple"><button class="back" onclick="go('s-snap-upload')">←</button><div><h1>פריטים שזוהו</h1><p id="snapItemCount">3 פריטים</p></div><div class="hdr-right"><button class="hdr-btn" onclick="showToast('נשמר לארון! 👗')">+</button></div></div>
   <div class="scr-body">
     <div class="thumb-wrap"><img id="snapThumbImg"/><div class="thumb-ph" id="snapThumbPh">👗</div><div class="thumb-grad"></div><div class="thumb-lbl">האאוטפיט שלך</div></div>
     <div class="sec-lbl" style="margin-top:4px">לחץ על פריט לחיפוש מוצרים</div>
     <div id="snapItemList"></div>
-    <button class="mock-btn" style="margin:8px 16px 0;width:calc(100% - 32px)" onclick="go('s-snap-upload')">📷 צלם מחדש</button>
+    <button class="action-btn secondary" style="margin-top:8px" onclick="go('s-snap-upload')">📷 צלם מחדש</button>
   </div>
 </div>
 
-<!-- ═══════════════════════ SNAP: PRODUCTS ═══════════════════════ -->
+<!-- ════════════════ SNAP: PRODUCTS ════════════════ -->
 <div class="screen" id="s-snap-products">
-  <div class="hdr"><button class="back" onclick="go('s-snap-detected')">←</button><div class="prod-hdr-info"><h1>מוצרים דומים</h1><p id="snapProdSub">חולצה · כחול</p></div></div>
+  <div class="hdr hdr-simple"><button class="back" onclick="go('s-snap-detected')">←</button><div class="prod-hdr-info"><h1>מוצרים דומים</h1><p id="snapProdSub">חולצה · כחול</p></div></div>
   <div class="scr-body">
     <div class="top-grid" id="snapTopGrid"></div>
     <div class="more-lbl">עוד מוצרים</div>
@@ -531,28 +519,28 @@ body{
   </div>
 </div>
 
-<!-- ═══════════════════════ SOCIAL: UPLOAD ═══════════════════════ -->
+<!-- ════════════════ SOCIAL: UPLOAD ════════════════ -->
 <div class="screen" id="s-social-upload">
-  <div class="hdr"><button class="back" onclick="goHome()">←</button><div><h1>Social Snap</h1><p>זהה בגדים מתמונת רשת</p></div></div>
-  <div class="scr-body">
+  <div class="hdr hdr-simple"><button class="back" onclick="goHome()">←</button><div><h1>Social Snap</h1><p>זהה בגדים מתמונת רשת</p></div></div>
+  <div class="scr-body" style="padding-top:16px;">
     <input type="file" id="socialFile" accept="image/*" onchange="handleSocial(event)" style="display:none"/>
-    <div class="upload-drop" style="border-color:#fcd34d;background:#fffbeb" onclick="document.getElementById('socialFile').click()">
+    <div class="upload-area" style="border-color:#fcd34d;background:#fffbeb;margin-bottom:4px;" onclick="document.getElementById('socialFile').click()">
       <div class="upl-icon">🌟</div>
       <div class="upl-title">העלה תמונה מהרשת</div>
       <div class="upl-sub">אינסטגרם, טיקטוק, Pinterest — כל תמונת לוק</div>
     </div>
     <div class="src-grid">
-      <div class="src-card" onclick="runSocialMock()"><div class="src-ico">🌟</div><div class="src-name">דמו</div><div class="src-sub">תנסה בלי להעלות</div></div>
+      <div class="src-card" onclick="runSocialMock()"><div class="src-ico">🎯</div><div class="src-name">דמו</div><div class="src-sub">תנסה ללא העלאה</div></div>
       <div class="src-card" onclick="document.getElementById('socialFile').click()"><div class="src-ico">🖼️</div><div class="src-name">הגלריה שלי</div><div class="src-sub">תמונות שמורות</div></div>
-      <div class="src-card" onclick="alert('בגרסה האמיתית — הדבקת לינק Instagram')"><div class="src-ico">📸</div><div class="src-name">Instagram</div><div class="src-sub">הדבק לינק</div></div>
-      <div class="src-card" onclick="alert('בגרסה האמיתית — הדבקת לינק TikTok')"><div class="src-ico">🎵</div><div class="src-name">TikTok</div><div class="src-sub">הדבק לינק</div></div>
+      <div class="src-card" onclick="showToast('בגרסה המלאה!')"><div class="src-ico">📸</div><div class="src-name">Instagram</div><div class="src-sub">הדבק לינק</div></div>
+      <div class="src-card" onclick="showToast('בגרסה המלאה!')"><div class="src-ico">🎵</div><div class="src-name">TikTok</div><div class="src-sub">הדבק לינק</div></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════ SOCIAL: SCANNING ═══════════════════════ -->
+<!-- ════════════════ SOCIAL: SCANNING ════════════════ -->
 <div class="screen" id="s-social-scan">
-  <div class="hdr"><button class="back" onclick="go('s-social-upload')">←</button><div><h1>סורק</h1><p>AI מאתר בגדים בתמונה...</p></div></div>
+  <div class="hdr hdr-simple"><button class="back" onclick="go('s-social-upload')">←</button><div><h1>סורק</h1><p>AI מאתר בגדים...</p></div></div>
   <div class="scan-wrap">
     <div class="scan-img-box" style="background:linear-gradient(135deg,#1e293b,#334155)">
       <img id="socialScanImg"/><div class="scan-ph" id="socialScanPh">👗</div>
@@ -567,9 +555,9 @@ body{
   </div>
 </div>
 
-<!-- ═══════════════════════ SOCIAL: RESULTS ═══════════════════════ -->
+<!-- ════════════════ SOCIAL: RESULTS ════════════════ -->
 <div class="screen" id="s-social-results">
-  <div class="hdr"><button class="back" onclick="go('s-social-upload')">←</button><div><h1>זוהו 3 פריטים</h1><p>לחץ על נקודה לפרטים</p></div></div>
+  <div class="hdr hdr-simple"><button class="back" onclick="go('s-social-upload')">←</button><div><h1>זוהו 3 פריטים</h1><p>לחץ על נקודה לפרטים</p></div></div>
   <div class="scr-body">
     <div class="tag-wrap" id="socialTagWrap">
       <img id="socialTagImg"/><div class="tag-ph" id="socialTagPh">👗</div>
@@ -579,17 +567,17 @@ body{
   </div>
 </div>
 
-<!-- ═══════════════════════ TWIN: SELECT ═══════════════════════ -->
+<!-- ════════════════ TWIN: SELECT ════════════════ -->
 <div class="screen" id="s-twin-select">
-  <div class="hdr"><button class="back" onclick="goHome()">←</button><div><h1>Style Twin</h1><p>בחר סגנון לשכפל</p></div></div>
-  <div class="scr-body">
+  <div class="hdr hdr-simple"><button class="back" onclick="goHome()">←</button><div><h1>Style Twin</h1><p>בחר סגנון לשכפל</p></div></div>
+  <div class="scr-body" style="padding-top:16px;">
     <input type="file" id="twinFile" accept="image/*" onchange="handleTwin(event)" style="display:none"/>
-    <div class="upload-drop" style="border-color:#fcd34d;background:#fffbeb" onclick="document.getElementById('twinFile').click()">
+    <div class="upload-area" style="border-color:#fcd34d;background:#fffbeb;margin-bottom:4px;" onclick="document.getElementById('twinFile').click()">
       <div class="upl-icon">📸</div>
       <div class="upl-title">העלה תמונה</div>
       <div class="upl-sub">של אדם עם סגנון שאהבת</div>
     </div>
-    <div style="padding:0 20px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">או בחר סגנון</div>
+    <div style="padding:4px 20px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">או בחר סגנון</div>
     <div class="style-grid">
       <div class="sty-ex" onclick="startTwin('Streetwear')"><div class="sty-ico">🧢</div><div class="sty-name">Streetwear</div></div>
       <div class="sty-ex" onclick="startTwin('Business Casual')"><div class="sty-ico">👔</div><div class="sty-name">Business Casual</div></div>
@@ -601,9 +589,9 @@ body{
   </div>
 </div>
 
-<!-- ═══════════════════════ TWIN: ANALYZING ═══════════════════════ -->
+<!-- ════════════════ TWIN: ANALYZING ════════════════ -->
 <div class="screen" id="s-twin-analyze">
-  <div class="hdr"><button class="back" onclick="go('s-twin-select')">←</button><div><h1>מנתח סגנון</h1><p>AI מזהה את ה-DNA של הלוק...</p></div></div>
+  <div class="hdr hdr-simple"><button class="back" onclick="go('s-twin-select')">←</button><div><h1>מנתח סגנון</h1><p>AI מזהה את ה-DNA...</p></div></div>
   <div class="anl-wrap">
     <div class="anl-img-rel">
       <div class="anl-img-box"><img id="twinAnlImg"/><div class="anl-ph" id="twinAnlPh"></div></div>
@@ -615,14 +603,14 @@ body{
   </div>
 </div>
 
-<!-- ═══════════════════════ TWIN: RESULTS ═══════════════════════ -->
+<!-- ════════════════ TWIN: RESULTS ════════════════ -->
 <div class="screen" id="s-twin-results">
-  <div class="hdr"><button class="back" onclick="go('s-twin-select')">←</button><div><h1 id="twinResultTitle">Style Twin</h1><p>בחר תקציב</p></div></div>
+  <div class="hdr hdr-simple"><button class="back" onclick="go('s-twin-select')">←</button><div><h1 id="twinResultTitle">Style Twin</h1><p>בחר תקציב</p></div></div>
   <div class="scr-body">
     <div class="id-card">
       <div class="id-img"><img id="twinIdImg"/><div class="id-ph" id="twinIdPh"></div></div>
       <div class="id-meta">
-        <div class="id-top">זוהה הסגנון</div>
+        <div class="id-top">זוהה הסגנון ✨</div>
         <div class="id-sty" id="twinIdStyle">Streetwear</div>
         <div class="id-tags" id="twinIdTags"></div>
       </div>
@@ -636,88 +624,241 @@ body{
   </div>
 </div>
 
-</div><!-- /phone -->
+<!-- ════════════════ WARDROBE ════════════════ -->
+<div class="screen" id="s-wardrobe">
+  <div class="hdr hdr-simple">
+    <div style="flex:1"><h1>הארון שלי</h1><p>12 פריטים · 3 לוקים</p></div>
+    <div class="hdr-right">
+      <button class="hdr-btn" onclick="showToast('הוספת פריט 📸')">+</button>
+    </div>
+  </div>
+  <div class="scr-body" style="padding-top:16px;">
+    <!-- stats -->
+    <div class="wardrobe-hero">
+      <div class="wardrobe-stats">
+        <div class="w-stat-num">12</div>
+        <div class="w-stat-lbl">פריטים בארון</div>
+      </div>
+      <div class="w-cats">
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#6366f1"></div><span class="w-cat-lbl">חולצות</span><span class="w-cat-num">4</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#ec4899"></div><span class="w-cat-lbl">מכנסיים</span><span class="w-cat-num">3</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#f59e0b"></div><span class="w-cat-lbl">נעליים</span><span class="w-cat-num">3</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#10b981"></div><span class="w-cat-lbl">אביזרים</span><span class="w-cat-num">2</span></div>
+      </div>
+    </div>
+
+    <!-- filter -->
+    <div class="filter-tabs">
+      <div class="ftab active" onclick="setFilter(this,'all')">הכל</div>
+      <div class="ftab" onclick="setFilter(this,'tops')">חולצות</div>
+      <div class="ftab" onclick="setFilter(this,'bottoms')">מכנסיים</div>
+      <div class="ftab" onclick="setFilter(this,'footwear')">נעליים</div>
+      <div class="ftab" onclick="setFilter(this,'accessories')">אביזרים</div>
+    </div>
+
+    <!-- grid -->
+    <div class="section-hdr"><span class="section-title">הפריטים שלי</span></div>
+    <div class="wardrobe-grid" id="wardrobeGrid">
+      <div class="witem"><div class="witem-img" style="background:#eff6ff">👕</div><div class="witem-info"><div class="witem-name">Nike Club Tee</div><div class="witem-meta">Navy · חולצת טי</div></div><div class="witem-badge">×3</div></div>
+      <div class="witem"><div class="witem-img" style="background:#f0fdf4">👟</div><div class="witem-info"><div class="witem-name">Stan Smith</div><div class="witem-meta">White · סניקרס</div></div></div>
+      <div class="witem"><div class="witem-img" style="background:#faf5ff">👖</div><div class="witem-info"><div class="witem-name">Levi's 511</div><div class="witem-meta">Dark Indigo · ג'ינס</div></div></div>
+      <div class="witem"><div class="witem-img" style="background:#fff7ed">🧥</div><div class="witem-info"><div class="witem-name">Slim Blazer</div><div class="witem-meta">Navy · ג'קט</div></div></div>
+      <div class="witem"><div class="witem-img" style="background:#fdf2f8">👔</div><div class="witem-info"><div class="witem-name">Oxford Shirt</div><div class="witem-meta">White · פורמלי</div></div></div>
+      <div class="witem"><div class="witem-img" style="background:#f0fdf4">🧢</div><div class="witem-info"><div class="witem-name">Snapback</div><div class="witem-meta">Black · כובע</div></div></div>
+      <div class="witem"><div class="witem-img" style="background:#fef3c7">👞</div><div class="witem-info"><div class="witem-name">Derby Shoes</div><div class="witem-meta">Brown · נעל</div></div></div>
+      <div class="witem"><div class="witem-img" style="background:#eff6ff">🩳</div><div class="witem-info"><div class="witem-name">Chino Shorts</div><div class="witem-meta">Beige · מכנסיים</div></div></div>
+      <div class="add-witem" onclick="showToast('צלם פריט חדש 📸')">
+        <div class="add-icon">＋</div>
+        <div class="add-lbl">הוסף פריט</div>
+      </div>
+    </div>
+
+    <!-- outfit suggestion -->
+    <div class="outfit-section">
+      <div class="section-hdr"><span class="section-title">💡 לוק מוצע היום</span></div>
+      <div class="outfit-card">
+        <div class="outfit-title">Business Casual · ספורטיבי</div>
+        <div class="outfit-sub">משולב מהפריטים שלך · תואם 95%</div>
+        <div class="outfit-pieces">
+          <div class="outfit-piece">👔</div>
+          <div class="outfit-piece">👖</div>
+          <div class="outfit-piece">👞</div>
+          <div class="outfit-piece">⌚</div>
+        </div>
+        <button class="outfit-action" onclick="showToast('🎉 לוק נשמר!')">🛒 קנה פריטים חסרים</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ WISHLIST ════════════════ -->
+<div class="screen" id="s-wishlist">
+  <div class="hdr hdr-simple">
+    <div style="flex:1"><h1>Wishlist</h1><p>5 פריטים שמורים</p></div>
+  </div>
+  <div class="scr-body" style="padding-top:16px;">
+    <div class="wish-banner">
+      <div class="wish-banner-h">❤️ הרשימה שלי</div>
+      <div class="wish-banner-sub">אנחנו עוקבים אחרי המחירים ונודיע כשיירד</div>
+      <div class="wish-banner-stat">₪1,547</div>
+      <div class="wish-banner-stat-lbl">שווי כולל ב-Wishlist</div>
+    </div>
+
+    <div class="price-track-banner">
+      <div class="ptb-icon">🔔</div>
+      <div class="ptb-text">
+        <div class="ptb-h">מעקב מחיר פעיל</div>
+        <div class="ptb-sub">תקבל התראה כשמחיר יירד מ-10%</div>
+      </div>
+    </div>
+
+    <div class="wish-list">
+      <div class="wish-item">
+        <div class="wish-item-img" style="background:#eff6ff">👟</div>
+        <div class="wish-item-info">
+          <div class="wish-item-name">Nike Air Force 1</div>
+          <div class="wish-item-store">Nike · לבן</div>
+          <div class="wish-price-row">
+            <span class="wish-price">₪449</span>
+            <span class="wish-price-orig">₪519</span>
+            <span class="wish-badge">-13%</span>
+          </div>
+        </div>
+        <div class="wish-actions">
+          <button class="wish-buy" onclick="showToast('פותח Nike ↗')">קנה</button>
+          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
+        </div>
+      </div>
+
+      <div class="wish-item">
+        <div class="wish-item-img" style="background:#faf5ff">🧥</div>
+        <div class="wish-item-info">
+          <div class="wish-item-name">Arc'teryx Shell Jacket</div>
+          <div class="wish-item-store">Arc'teryx · שחור</div>
+          <div class="wish-price-row">
+            <span class="wish-price">₪799</span>
+            <span class="wish-badge alert">יקר עדיין</span>
+          </div>
+        </div>
+        <div class="wish-actions">
+          <button class="wish-buy" onclick="showToast('פותח Arc\'teryx ↗')">קנה</button>
+          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
+        </div>
+      </div>
+
+      <div class="wish-item">
+        <div class="wish-item-img" style="background:#fef3c7">⌚</div>
+        <div class="wish-item-info">
+          <div class="wish-item-name">Casio G-Shock</div>
+          <div class="wish-item-store">Casio · שחור</div>
+          <div class="wish-price-row">
+            <span class="wish-price">₪149</span>
+            <span class="wish-badge">מחיר טוב!</span>
+          </div>
+        </div>
+        <div class="wish-actions">
+          <button class="wish-buy" onclick="showToast('פותח Casio ↗')">קנה</button>
+          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
+        </div>
+      </div>
+
+      <div class="wish-item">
+        <div class="wish-item-img" style="background:#f0fdf4">👖</div>
+        <div class="wish-item-info">
+          <div class="wish-item-name">Carhartt Wide Cargo</div>
+          <div class="wish-item-store">Carhartt · חאקי</div>
+          <div class="wish-price-row">
+            <span class="wish-price">₪329</span>
+          </div>
+        </div>
+        <div class="wish-actions">
+          <button class="wish-buy" onclick="showToast('פותח Carhartt ↗')">קנה</button>
+          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
+        </div>
+      </div>
+
+      <div class="wish-item">
+        <div class="wish-item-img" style="background:#fdf2f8">👜</div>
+        <div class="wish-item-info">
+          <div class="wish-item-name">Gorjana Necklace Set</div>
+          <div class="wish-item-store">Gorjana · זהב</div>
+          <div class="wish-price-row">
+            <span class="wish-price">₪169</span>
+            <span class="wish-price-orig">₪199</span>
+            <span class="wish-badge">-15%</span>
+          </div>
+        </div>
+        <div class="wish-actions">
+          <button class="wish-buy" onclick="showToast('פותח Gorjana ↗')">קנה</button>
+          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
 <script>
-// ── Navigation ─────────────────────────────────
-let currentNav = 'nav-home';
-function go(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function goHome(){ navTo('s-home','nav-home'); }
-function navTo(screenId, navId){
+// ── Nav ───────────────────────────────────────────
+const SCREENS=['s-home','s-snap-upload','s-snap-scan','s-snap-detected','s-snap-products','s-social-upload','s-social-scan','s-social-results','s-twin-select','s-twin-analyze','s-twin-results','s-wardrobe','s-wishlist'];
+const NAV_IDS=['nav-home','nav-snap','nav-social','nav-twin','nav-wardrobe','nav-wishlist'];
+const NAV_MAP={
+  'nav-home':'s-home','nav-snap':'s-snap-upload','nav-social':'s-social-upload',
+  'nav-twin':'s-twin-select','nav-wardrobe':'s-wardrobe','nav-wishlist':'s-wishlist'
+};
+
+function go(id){
+  SCREENS.forEach(s=>{const el=document.getElementById(s);if(el)el.classList.remove('active');});
+  const t=document.getElementById(id);if(t)t.classList.add('active');
+  // sync bottom-nav across all screens — clone nav to active screen
+  syncNav();
+}
+function goHome(){navTo('s-home','nav-home');}
+function navTo(screenId,navId){
   go(screenId);
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const navMap={'nav-home':'s-home','nav-snap':'s-snap-upload','nav-social':'s-social-upload','nav-twin':'s-twin-select'};
-  // find nav button by onclick containing navId... simpler: re-render
-  document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick') && n.getAttribute('onclick').includes(navId)) n.classList.add('active'); });
+  NAV_IDS.forEach(n=>{const el=document.getElementById(n);if(el)el.classList.remove('active');});
+  const active=document.getElementById(navId);if(active)active.classList.add('active');
+}
+function syncNav(){
+  // All nav items across all screen copies stay in sync by ID — nothing to clone, single DOM
 }
 
-// shared scan animation
-function runScan(steps, inds, cb){
-  steps.forEach((s,i)=>{ document.getElementById(s).className='step'; document.getElementById(inds[i]).textContent=''; });
+// ── Toast ─────────────────────────────────────────
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// ── Scan helper ───────────────────────────────────
+function runScan(steps,inds,cb){
+  steps.forEach((s,i)=>{document.getElementById(s).className='step';document.getElementById(inds[i]).textContent='';});
   function act(i){
-    if(i>0){ document.getElementById(steps[i-1]).className='step done'; document.getElementById(inds[i-1]).textContent='✅'; }
-    if(i<steps.length){ document.getElementById(steps[i]).className='step active'; document.getElementById(inds[i]).innerHTML='<div class="spinner"></div>'; }
+    if(i>0){document.getElementById(steps[i-1]).className='step done';document.getElementById(inds[i-1]).textContent='✅';}
+    if(i<steps.length){document.getElementById(steps[i]).className='step active';document.getElementById(inds[i]).innerHTML='<div class="spinner"></div>';}
   }
   act(0);
   setTimeout(()=>act(1),800);
   setTimeout(()=>act(2),1600);
-  setTimeout(()=>{ document.getElementById(steps[2]).className='step done'; document.getElementById(inds[2]).textContent='✅'; },2400);
+  setTimeout(()=>{document.getElementById(steps[2]).className='step done';document.getElementById(inds[2]).textContent='✅';},2400);
   setTimeout(cb,2900);
 }
 function setImg(imgId,phId,url,emoji){
-  const img=document.getElementById(imgId), ph=document.getElementById(phId);
-  if(url){ img.src=url; img.classList.add('show'); ph.style.display='none'; }
-  else{ img.classList.remove('show'); ph.style.display='flex'; if(emoji) ph.textContent=emoji; }
+  const img=document.getElementById(imgId),ph=document.getElementById(phId);
+  if(url){img.src=url;img.classList.add('show');ph.style.display='none';}
+  else{img.classList.remove('show');ph.style.display='flex';if(emoji)ph.textContent=emoji;}
 }
 
-// ══════════════════════════════
-// SNAP FLOW
-// ══════════════════════════════
-const snapItems=[
+// ══════════════════ SNAP ══════════════════
+let snapItems=[
   {id:1,type:'חולצת טי',cat:'tops',color:'Navy Blue',hex:'#1e3a8a',brand:'Nike',style:'Casual',gender:'גברים',conf:.95},
   {id:2,type:"ג'ינס",cat:'bottoms',color:'Dark Indigo',hex:'#312e81',brand:"Levi's",style:'Classic',gender:'גברים',conf:.91},
   {id:3,type:'סניקרס',cat:'footwear',color:'White',hex:'#f9fafb',brand:'Adidas',style:'Sport',gender:'יוניסקס',conf:.88},
 ];
-let currentSnapItems=[];
-// Generic products by category (used for real AI results)
-const genericProds={
-  tops:{featured:[{name:'Classic Tee',store:'Zara',price:89,emoji:'👕',bg:'#eff6ff'},{name:'Essential Shirt',store:'H&M',price:79,orig:119,emoji:'👔',bg:'#f0fdf4',sp:true}],more:[{name:'Oxford Shirt',store:'Uniqlo',price:119,e:'👔',bg:'#fff'},{name:'Polo Shirt',store:'Mango',price:149,e:'🏇',bg:'#f9f9f9'},{name:'Linen Shirt',store:'Pull&Bear',price:99,e:'🌿',bg:'#f0fdf4'},{name:'Button Down',store:'Gap',price:89,e:'🔵',bg:'#eff6ff'},{name:'V-Neck Tee',store:'ASOS',price:69,e:'✨',bg:'#faf5ff'},{name:'Crop Top',store:'Bershka',price:59,e:'💗',bg:'#fdf2f8'}]},
-  bottoms:{featured:[{name:'Slim Fit Jeans',store:"Levi's",price:249,emoji:'👖',bg:'#eff6ff'},{name:'Chino Pants',store:'H&M',price:149,orig:199,emoji:'👖',bg:'#f9f9f9',sp:true}],more:[{name:'Cargo Pants',store:'Zara',price:189,e:'🪖',bg:'#f0fdf4'},{name:'Skinny Jeans',store:'ASOS',price:179,e:'✨',bg:'#faf5ff'},{name:'Wide Leg',store:'Pull&Bear',price:159,e:'👖',bg:'#fff'},{name:'Mom Jeans',store:'Stradivarius',price:139,e:'💫',bg:'#fdf2f8'},{name:'Straight Cut',store:'Uniqlo',price:169,e:'🌿',bg:'#f0fdf4'},{name:'Joggers',store:'Nike',price:199,e:'⚡',bg:'#eff6ff'}]},
-  footwear:{featured:[{name:'Classic Sneakers',store:'Adidas',price:349,emoji:'👟',bg:'#f0fdf4'},{name:'Air Force 1',store:'Nike',price:449,emoji:'🏃',bg:'#eff6ff',sp:true}],more:[{name:'Chuck Taylor',store:'Converse',price:249,e:'⭐',bg:'#f9f9f9'},{name:'Old Skool',store:'Vans',price:269,e:'🛹',bg:'#fff'},{name:'Suede Classic',store:'Puma',price:299,e:'🐆',bg:'#faf5ff'},{name:'Derby Shoes',store:'ALDO',price:199,e:'👞',bg:'#fafafa'},{name:'Chelsea Boots',store:"Clark's",price:349,e:'🥾',bg:'#fff7ed'},{name:'Sandals',store:'Birkenstock',price:279,e:'👡',bg:'#fef9c3'}]},
-  accessories:{featured:[{name:'Classic Watch',store:'Casio',price:149,emoji:'⌚',bg:'#f9f9f9'},{name:'Leather Belt',store:'H&M',price:59,emoji:'👛',bg:'#fff7ed',sp:true}],more:[{name:'Snapback Cap',store:'New Era',price:89,e:'🧢',bg:'#fafafa'},{name:'Sunglasses',store:'Ray-Ban',price:399,e:'🕶️',bg:'#f0fdf4'},{name:'Crossbody Bag',store:'Mango',price:179,e:'👜',bg:'#fef3c7'},{name:'Silk Scarf',store:'Zara',price:99,e:'🧣',bg:'#fdf2f8'},{name:'Chain Necklace',store:'H&M',price:49,e:'📿',bg:'#f9f9f9'},{name:'Canvas Tote',store:'Uniqlo',price:39,e:'🛍️',bg:'#eff6ff'}]},
-  outerwear:{featured:[{name:'Hoodie',store:'Nike',price:249,emoji:'🧥',bg:'#eff6ff'},{name:'Denim Jacket',store:"Levi's",price:299,emoji:'🧥',bg:'#f0fdf4',sp:true}],more:[{name:'Windbreaker',store:'Adidas',price:199,e:'🌧️',bg:'#f1f5f9'},{name:'Puffer Jacket',store:'H&M',price:249,e:'🧥',bg:'#eff6ff'},{name:'Trench Coat',store:'Zara',price:499,e:'🌂',bg:'#fafafa'},{name:'Blazer',store:'Mango',price:349,e:'👔',bg:'#fff7ed'},{name:'Bomber',store:'ASOS',price:199,e:'✈️',bg:'#f0fdf4'},{name:'Cardigan',store:'Uniqlo',price:149,e:'🎀',bg:'#fdf2f8'}]},
-};
-
-// ── Real Claude API call ──────────────────────
-async function analyzeImage(imgUrl){
-  // Load image and resize to max 1024px to stay under Vercel's 4.5MB body limit
-  return new Promise((resolve,reject)=>{
-    const img=new Image();
-    img.onload=async function(){
-      try{
-        const MAX=1024;
-        let w=img.width, h=img.height;
-        if(w>MAX||h>MAX){ const s=Math.min(MAX/w,MAX/h); w=Math.round(w*s); h=Math.round(h*s); }
-        const canvas=document.createElement('canvas');
-        canvas.width=w; canvas.height=h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        const dataUrl=canvas.toDataURL('image/jpeg',0.85);
-        const base64=dataUrl.split(',')[1];
-        const apiResp=await fetch('/api/analyze',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({image:base64,mimeType:'image/jpeg'})
-        });
-        if(!apiResp.ok) throw new Error('שגיאת API: '+apiResp.status);
-        const data=await apiResp.json();
-        if(data.error) throw new Error(data.error);
-        resolve(data.items||[]);
-      }catch(err){ reject(err); }
-    };
-    img.onerror=reject;
-    img.src=imgUrl;
-  });
-}
 const catIcons={tops:'👕',bottoms:'👖',footwear:'👟',accessories:'⌚',default:'👔'};
 const snapProds={
   1:{featured:[{name:'Nike Club Tee',store:'Nike',price:139,emoji:'👕',bg:'#eff6ff'},{name:'Essential Tee',store:'H&M',price:89,orig:129,emoji:'👔',bg:'#f0fdf4',sp:true}],more:[{name:'Premium Crew',store:'Nordstrom',price:179,e:'🏷️',bg:'#f9f9f9'},{name:'Athletic Tee',store:'UA',price:109,e:'💪',bg:'#fff'},{name:'Organic Tee',store:'Uniqlo',price:79,e:'🌿',bg:'#f9f9f9'},{name:'Classic Fit',store:'Gap',price:99,e:'🏷️',bg:'#fff'},{name:'DriFit',store:'Nike',price:149,e:'⚡',bg:'#eff6ff'},{name:'Everyday',store:'Zara',price:89,e:'✨',bg:'#faf5ff'}]},
@@ -725,144 +866,97 @@ const snapProds={
   3:{featured:[{name:'Adidas Stan Smith',store:'Adidas',price:369,emoji:'⚽',bg:'#f0fdf4'},{name:'Nike Air Force 1',store:'Nike',price:449,emoji:'🏃',bg:'#eff6ff',sp:true}],more:[{name:'Classic Leather',store:'Reebok',price:289,e:'🏋️',bg:'#fff'},{name:'Chuck Taylor',store:'Converse',price:249,e:'⭐',bg:'#f9f9f9'},{name:'Old Skool',store:'Vans',price:269,e:'🛹',bg:'#fff'},{name:'Suede Classic',store:'Puma',price:299,e:'🐆',bg:'#faf5ff'},{name:'Fresh Foam',store:'NB',price:339,e:'🔵',bg:'#eff6ff'},{name:'Gel-Lite',store:'Asics',price:389,e:'🏃',bg:'#f9f9f9'}]},
 };
 let snapImgUrl=null;
-let _snapLock=false;
+
+window.addEventListener('load',function(){
+  var cam=document.getElementById('snapCameraFile');
+  var gal=document.getElementById('snapGalleryFile');
+  if(cam)cam.addEventListener('change',handleSnap);
+  if(gal)gal.addEventListener('change',handleSnap);
+});
+
 function handleSnap(e){
-  const f=e.target.files[0]; if(!f) return;
-  if(_snapLock) return; // prevent double-fire from multiple file inputs
-  _snapLock=true;
-  // reset other file input so it doesn't re-fire
-  const otherId = e.target.id==='snapCameraFile'?'snapGalleryFile':'snapCameraFile';
-  const other=document.getElementById(otherId); if(other) other.value='';
+  var f=e.target.files&&e.target.files[0];if(!f)return;
+  e.target.value='';
   snapImgUrl=URL.createObjectURL(f);
-  startSnapScan(true);
+  var reader=new FileReader();
+  reader.onload=function(ev){startSnapScan(ev.target.result.split(',')[1],f.type||'image/jpeg');};
+  reader.onerror=function(){startSnapScan(null,null);};
+  reader.readAsDataURL(f);
 }
-function runSnapMock(){ snapImgUrl=null; startSnapScan(false); }
-async function startSnapScan(useRealApi){
+function runSnapMock(){snapImgUrl=null;startSnapScan(null,null);}
+function startSnapScan(base64,mimeType){
   go('s-snap-scan');
   setImg('snapScanImg','snapScanPh',snapImgUrl,'👗');
-  const scanPromise=new Promise(resolve=>runScan(['ss1','ss2','ss3'],['ss1i','ss2i','ss3i'],resolve));
-  if(useRealApi && snapImgUrl){
-    try{
-      const [items]=await Promise.all([analyzeImage(snapImgUrl),scanPromise]);
-      console.log('AI items received:',items);
-      currentSnapItems=items.length>0?items:snapItems;
-    }catch(err){
-      console.warn('AI analysis failed, using mock:',err.message);
-      await scanPromise;
-      currentSnapItems=snapItems;
-    }
-  }else{
-    await scanPromise;
-    currentSnapItems=snapItems;
+  var animDone=false,apiDone=false,apiItems=null;
+  function tryFinish(){
+    if(!animDone||!apiDone)return;
+    if(apiItems&&apiItems.length>0)snapItems=apiItems.map((item,i)=>Object.assign({},item,{id:i+1}));
+    showSnapDetected();go('s-snap-detected');
   }
-  _snapLock=false;
-  showSnapDetected();
-  go('s-snap-detected');
+  runScan(['ss1','ss2','ss3'],['ss1i','ss2i','ss3i'],function(){animDone=true;tryFinish();});
+  if(base64){
+    fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:base64,mimeType:mimeType})})
+      .then(r=>r.json()).then(data=>{apiItems=data.items||null;apiDone=true;tryFinish();})
+      .catch(()=>{apiDone=true;tryFinish();});
+  }else{apiDone=true;}
 }
 function showSnapDetected(){
   setImg('snapThumbImg','snapThumbPh',snapImgUrl,'👗');
-  document.getElementById('snapItemCount').textContent=currentSnapItems.length+' פריטים';
-  const list=document.getElementById('snapItemList'); list.innerHTML='';
-  if(currentSnapItems.length===0){
-    list.innerHTML=`<div class="empty-state">
-      <div class="empty-ico">🤷</div>
-      <div class="empty-msg">לא זיהינו בגדים בתמונה 🤷<br>נסה תמונה עם תאורה טובה יותר</div>
-      <button class="empty-btn" onclick="go('s-snap-upload')">נסה שוב</button>
-    </div>`;
-    return;
-  }
-  currentSnapItems.forEach((item,idx)=>{
-    const ico=catIcons[item.cat]||catIcons.default, pct=Math.round((item.conf||0.85)*100);
+  document.getElementById('snapItemCount').textContent=snapItems.length+' פריטים';
+  const list=document.getElementById('snapItemList');list.innerHTML='';
+  snapItems.forEach(item=>{
+    const ico=catIcons[item.cat]||catIcons.default,pct=Math.round(item.conf*100);
     const cls=pct>=85?'cg':'cy';
     const meta=[item.color,item.brand,item.style,item.gender].filter(Boolean).join(' · ');
-    const el=document.createElement('div');
-    el.className='item-row';
-    el.style.cssText=`animation:fadeInCard .3s ease both;animation-delay:${idx*100}ms;opacity:0`;
-    el.onclick=()=>showSnapProducts(item.id);
-    el.innerHTML=`
-      <div class="swatch-wrap"><div class="swatch" style="background:${item.hex||'#888'}"></div><span class="cat-ico">${ico}</span></div>
+    list.innerHTML+=`<div class="item-row" onclick="showSnapProducts(${item.id})">
+      <div class="swatch-wrap"><div class="swatch" style="background:${item.hex}"></div><span class="cat-ico">${ico}</span></div>
       <div class="item-info"><div class="item-name-row"><span class="iname">${item.type}</span><span class="cbadge ${cls}">${pct}%</span></div><div class="imeta">${meta}</div></div>
-      <div class="shop-ico">🛍️</div><span style="color:var(--muted);font-size:18px">›</span>`;
-    list.appendChild(el);
+      <div class="shop-ico">🛍️</div><span style="color:var(--muted);font-size:18px">›</span>
+    </div>`;
   });
 }
-const _storeEmoji={'Nike':'⚡','Adidas':'🔷',"Levi's":'🔵','Zara':'🏷️','H&M':'🛍️','Uniqlo':'🟥','ASOS':'💜','Converse':'⭐','Vans':'🛹','Pull&Bear':'🐻','Mango':'🥭','Gap':'🏔️','Nordstrom':'🏢','UA':'🛡️','Reebok':'🏋️','Puma':'🐆','Stradivarius':'🌸','NB':'🔵','Asics':'🏃','Bershka':'🔥',"J.Crew":'🎀','Old Navy':'⚓','BR':'🍌','AE':'🦅','ALDO':'👞','Casio':'⌚','New Era':'🧢','Nike ACG':'⚡','Arc\'teryx':'🏔️','Supreme':'🔴','Off-White':'⬜','Decathlon':'🟢'};
-// ── Real product images by category (Unsplash CDN, no API key needed) ──
-const _catImgs={
-  tops:['1521572163474-6864f9cf17ab','1583743814966-8936f5b7be1a','1576566588028-4147f3842f27','1434389677669-e08b4cac3105','1503341504253-dff4815485f1','1562157873-818bc0726f68','1594938298870-57977c7f2fc1'],
-  bottoms:['1542272604-787c3835535d','1541099649105-f69ad21f3246','1604176354204-9268737828e4','1555689502-c4b22d76c5e0','1591213954555-09ba0c7cf9e8'],
-  footwear:['1542291026-7eec264c27ff','1595950653106-6c9ebd614d3a','1560769629-975ec94e6a86','1600269452121-4f2416e55c28'],
-  accessories:['1523779917675-e6ce9b3e686f','1553062407-98eeb64c6a62','1548036161-e7a154543e74'],
-  outerwear:['1551028719-00167b16eac5','1591047139829-d91aecb6caea','1544022613-e87ca75a784a','1606902965571-56a9e95c5d80'],
-};
-function _hash(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))&0xffff;return h;}
-function _pimg(name,cat){const a=_catImgs[cat]||_catImgs.tops;return`https://images.unsplash.com/photo-${a[_hash(name)%a.length]}?w=400&h=400&fit=crop&auto=format&q=80`;}
-function _shopUrl(name,store){return 'https://www.google.com/search?tbm=shop&q='+encodeURIComponent(name+' '+store);}
 function showSnapProducts(id){
-  const item=currentSnapItems.find(i=>i.id===id);
-  if(!item) return;
-  const data=snapProds[id]||(genericProds[item.cat]||genericProds.tops);
+  const item=snapItems.find(i=>i.id===id),data=snapProds[id]||snapProds[1];
   document.getElementById('snapProdSub').textContent=[item.type,item.color,item.brand].filter(Boolean).join(' · ');
-  // Show skeleton while "loading"
-  document.getElementById('snapTopGrid').innerHTML=`
-    <div class="skel-card"><div class="skel skel-img"></div><div class="skel skel-line"></div><div class="skel skel-line s60"></div><div class="skel skel-btn"></div></div>
-    <div class="skel-card"><div class="skel skel-img"></div><div class="skel skel-line"></div><div class="skel skel-line s60"></div><div class="skel skel-btn"></div></div>`;
-  document.getElementById('snapMoreGrid').innerHTML=Array(6).fill(0).map(()=>`<div class="skel-mini"><div class="skel skel-mini-img"></div><div class="skel skel-mini-line"></div><div class="skel skel-mini-line s50"></div></div>`).join('');
+  document.getElementById('snapTopGrid').innerHTML=data.featured.map((p,i)=>`
+    <div class="pcard" style="position:relative">
+      <div class="pcard-lbl">${p.sp?'<span class="spons">ממומן</span>':''}${i===0?'⭐ הכי מתאים':'🔄 דומה'}</div>
+      <div class="pimg" style="background:${p.bg}">${p.emoji}</div>
+      <div class="pinfo"><div class="pname">${p.name}</div><div class="pstore">${p.store}</div>
+      <div><span class="pprice">₪${p.price}</span>${p.orig?`<span class="porig">₪${p.orig}</span>`:''}</div></div>
+      <button class="pbtn" onclick="showToast('פותח ${p.name} ↗')">צפה במוצר ↗</button>
+      <button class="wish-btn" onclick="event.stopPropagation();showToast('נוסף ל-Wishlist ❤️')">❤️</button>
+    </div>`).join('');
+  document.getElementById('snapMoreGrid').innerHTML=data.more.map(p=>`
+    <div class="pmini" onclick="showToast('פותח ${p.name} ↗')"><div class="pmini-img" style="background:${p.bg}">${p.e}</div>
+    <div class="pmini-body"><div class="pmini-name">${p.name}</div><div class="pmini-store">${p.store}</div><div class="pmini-price">₪${p.price}</div></div></div>`).join('');
   go('s-snap-products');
-  // Render real cards after brief skeleton moment
-  setTimeout(()=>{
-    document.getElementById('snapTopGrid').innerHTML=data.featured.map((p,i)=>{
-      const disc=p.orig?Math.round((1-p.price/p.orig)*100):null;
-      const sico=_storeEmoji[p.store]||'🏪';
-      const url=_shopUrl(p.name,p.store);
-      return `<div class="pcard" style="animation-delay:${i*100}ms;position:relative">
-        ${disc?`<span class="sale-badge">-${disc}% הנחה</span>`:''}
-        <div class="pcard-lbl">${p.sp?'<span class="spons">ממומן</span>':''}${i===0?'⭐ הכי מתאים':'🔄 דומה'}</div>
-        <div class="pimg" style="background:${p.bg};padding:0;overflow:hidden"><img src="${_pimg(p.name,item.cat)}" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" onerror="this.parentNode.style.fontSize='36px';this.parentNode.textContent='${p.emoji}'" /></div>
-        <div class="pinfo">
-          <div class="pname">${p.name}</div>
-          <div class="pstore store-pill"><span class="s-ico">${sico}</span>${p.store}</div>
-          <div><span class="pprice">₪${p.price}</span>${p.orig?`<span class="porig">₪${p.orig}</span>`:''}</div>
-        </div>
-        <button class="pbtn" onclick="window.open('${url}','_blank')">לחץ לרכישה ↗</button>
-      </div>`;
-    }).join('');
-    document.getElementById('snapMoreGrid').innerHTML=data.more.map((p,i)=>{
-      const url=_shopUrl(p.name,p.store);
-      return `<div class="pmini" style="animation-delay:${(i+2)*100}ms;cursor:pointer" onclick="window.open('${url}','_blank')">
-        <div class="pmini-img" style="background:${p.bg};padding:0;overflow:hidden"><img src="${_pimg(p.name,item.cat)}" style="width:100%;height:72px;object-fit:cover;display:block" loading="lazy" onerror="this.parentNode.style.fontSize='26px';this.parentNode.textContent='${p.e}'" /></div>
-        <div class="pmini-body"><div class="pmini-name">${p.name}</div><div class="pmini-store">${p.store}</div><div class="pmini-price">₪${p.price}</div></div>
-      </div>`;
-    }).join('');
-  },420);
 }
 
-// ══════════════════════════════
-// SOCIAL FLOW
-// ══════════════════════════════
+// ══════════════════ SOCIAL ══════════════════
 const socialItems=[
   {id:1,n:1,name:'חולצת אוברסייז',sub:'לבן · Streetwear',color:'#f1f5f9',top:'18%',left:'45%',prods:[{name:'Oversized Basic',store:'Zara',price:89,e:'👕',bg:'#f0f9ff'},{name:'Boxy Tee',store:'H&M',price:59,e:'🤍',bg:'#fff7ed'},{name:'Urban Oversized',store:'ASOS',price:79,e:'👔',bg:'#f0fdf4'}]},
   {id:2,n:2,name:"מכנסי קארגו",sub:'זית · Casual',color:'#4d5c43',top:'55%',left:'30%',prods:[{name:'Cargo Pants',store:'Pull&Bear',price:149,e:'👖',bg:'#f0fdf4'},{name:'Utility Trousers',store:'Stradivarius',price:129,e:'🌿',bg:'#fff7ed'},{name:'Wide Leg Cargo',store:'ASOS',price:119,e:'🪖',bg:'#faf5ff'}]},
   {id:3,n:3,name:'נעלי פלטפורמה',sub:'שחור · Chunky',color:'#1a1a1a',top:'80%',left:'60%',prods:[{name:'Platform Sneaker',store:'Nike',price:449,e:'👟',bg:'#eff6ff'},{name:'Chunky Boot',store:'Dr.Martens',price:699,e:'🥾',bg:'#fff7ed'},{name:'Lug Sole',store:'Schuh',price:299,e:'🖤',bg:'#f0fdf4'}]},
 ];
-let socialImgUrl=null, socialActive=1;
-function handleSocial(e){ const f=e.target.files[0]; if(!f) return; socialImgUrl=URL.createObjectURL(f); startSocialScan(); }
-function runSocialMock(){ socialImgUrl=null; startSocialScan(); }
+let socialImgUrl=null,socialActive=1;
+function handleSocial(e){const f=e.target.files[0];if(!f)return;socialImgUrl=URL.createObjectURL(f);startSocialScan();}
+function runSocialMock(){socialImgUrl=null;startSocialScan();}
 function startSocialScan(){
   go('s-social-scan');
   setImg('socialScanImg','socialScanPh',socialImgUrl,'👗');
-  runScan(['sc1','sc2','sc3'],['sc1i','sc2i','sc3i'],()=>{ showSocialResults(); go('s-social-results'); });
+  runScan(['sc1','sc2','sc3'],['sc1i','sc2i','sc3i'],()=>{showSocialResults();go('s-social-results');});
 }
 function showSocialResults(){
   setImg('socialTagImg','socialTagPh',socialImgUrl,'👗');
   const wrap=document.getElementById('socialTagWrap');
   document.querySelectorAll('.dot').forEach(d=>d.remove());
   socialItems.forEach(item=>{
-    const d=document.createElement('div'); d.className='dot'+(item.id===socialActive?' active':'');
-    d.id='dot-'+item.id; d.textContent=item.n; d.style.top=item.top; d.style.left=item.left;
-    d.onclick=()=>selSocial(item.id); wrap.appendChild(d);
+    const d=document.createElement('div');d.className='dot'+(item.id===socialActive?' active':'');
+    d.id='dot-'+item.id;d.textContent=item.n;d.style.top=item.top;d.style.left=item.left;
+    d.onclick=()=>selSocial(item.id);wrap.appendChild(d);
   });
-  renderSocialChips(); renderSocialShop(socialActive);
+  renderSocialChips();renderSocialShop(socialActive);
 }
 function renderSocialChips(){
   document.getElementById('socialChips').innerHTML=socialItems.map(item=>`
@@ -877,23 +971,21 @@ function renderSocialShop(id){
   document.getElementById('socialShop').innerHTML=`
     <div class="shop-lbl">🛍️ פריט ${item.n} <span>· ${item.name}</span></div>
     <div class="prod-g3">${item.prods.map(p=>`
-      <div class="prd" onclick="alert('פותח ${p.name}...')">
+      <div class="prd" onclick="showToast('פותח ${p.name} ↗')">
         <div class="prd-img" style="background:${p.bg}">${p.e}</div>
         <div class="prd-bd"><div class="prd-nm">${p.name}</div><div class="prd-st">${p.store}</div><div class="prd-pr">₪${p.price}</div></div>
       </div>`).join('')}</div>
-    <button class="stl-btn" onclick="alert('🛍️ Shop the Full Look!')">🌟 Shop the Full Look</button>`;
+    <button class="stl-btn" onclick="showToast('🛍️ Shop the Full Look!')">🌟 Shop the Full Look</button>`;
 }
 function selSocial(id){
   socialActive=id;
   document.querySelectorAll('.dot').forEach(d=>d.classList.remove('active'));
-  const dot=document.getElementById('dot-'+id); if(dot) dot.classList.add('active');
-  renderSocialChips(); renderSocialShop(id);
+  const dot=document.getElementById('dot-'+id);if(dot)dot.classList.add('active');
+  renderSocialChips();renderSocialShop(id);
   document.getElementById('chip-'+id)?.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
 }
 
-// ══════════════════════════════
-// TWIN FLOW
-// ══════════════════════════════
+// ══════════════════ TWIN ══════════════════
 const twinData={
   'Streetwear':{icon:'🧢',attrs:['Urban','Oversized','Monochrome','Sneaker Culture'],
     b:{label:'💚 זול',total:380,c:'var(--green)',bg:'var(--green-bg)',items:[{e:'👕',bg:'#f1f5f9',name:'Oversized Tee',store:"H&M · שחור",price:59},{e:'👖',bg:'#f0fdf4',name:'Cargo Pants',store:"Pull&Bear · זית",price:149},{e:'👟',bg:'#eff6ff',name:'Classic Sneakers',store:"Skechers · לבן",price:129},{e:'🧢',bg:'#fafafa',name:'Snapback Cap',store:"New Era · שחור",price:69}]},
@@ -920,19 +1012,19 @@ const twinData={
     m:{label:'💙 בינוני',total:890,c:'var(--blue)',bg:'var(--blue-bg)',items:[{e:'⭐',bg:'#fdf2f8',name:'Rhinestone Top',store:"Urban Outfitters · כחול",price:199},{e:'👖',bg:'#eff6ff',name:'Flare Jeans',store:"Levi's · ג'ינס",price:299},{e:'👠',bg:'#fef3c7',name:'Mule Heels',store:"Steve Madden · ורוד",price:249},{e:'🦋',bg:'#fdf2f8',name:'Butterfly Bag',store:"ASOS · כסף",price:149}]},
     p:{label:'💜 פרמיום',total:3200,c:'var(--purple)',bg:'var(--purple-bg)',items:[{e:'💎',bg:'#fdf2f8',name:'Crystal Top',store:"Versace · שחור",price:1199},{e:'👖',bg:'#eff6ff',name:'Low Rise Jeans',store:"Diesel · vintage",price:799},{e:'👠',bg:'#fef3c7',name:'Platform Mules',store:"Prada · ורוד",price:1199},{e:'👜',bg:'#fdf2f8',name:'Mini Bag',store:"Fendi · כסף",price:899}]}},
 };
-let twinImgUrl=null, twinStyle='Streetwear', twinBudget='b';
-function handleTwin(e){ const f=e.target.files[0]; if(!f) return; twinImgUrl=URL.createObjectURL(f); startTwin('Streetwear'); }
+let twinImgUrl=null,twinStyle='Streetwear',twinBudget='b';
+function handleTwin(e){const f=e.target.files[0];if(!f)return;twinImgUrl=URL.createObjectURL(f);startTwin('Streetwear');}
 function startTwin(style){
-  twinStyle=style; twinBudget='b'; twinImgUrl=twinImgUrl||null;
+  twinStyle=style;twinBudget='b';
   go('s-twin-analyze');
   const data=twinData[style];
   setImg('twinAnlImg','twinAnlPh',twinImgUrl,data.icon);
-  const lbl=document.getElementById('twinAnlLbl'), sub=document.getElementById('twinAnlSub');
-  const attrs=document.getElementById('twinAttrs'); attrs.innerHTML='';
+  const lbl=document.getElementById('twinAnlLbl'),sub=document.getElementById('twinAnlSub');
+  const attrs=document.getElementById('twinAttrs');attrs.innerHTML='';
   const msgs=[['מזהה צבעים...','סורק פלטת הצבעים'],['מנתח חיתוכים...','בודק סילואטים ופרופורציות'],['מזהה סגנון...','מתאים לטרנדים עכשוויים'],[style+' ✨','זוהה הסגנון בהצלחה!']];
-  msgs.forEach((m,i)=>setTimeout(()=>{ lbl.textContent=m[0]; sub.textContent=m[1]; },i*600));
-  data.attrs.forEach((a,i)=>setTimeout(()=>{ const c=document.createElement('div'); c.className='attr'; c.textContent=a; attrs.appendChild(c); requestAnimationFrame(()=>c.classList.add('show')); },800+i*250));
-  setTimeout(()=>{ showTwinResults(style); go('s-twin-results'); },2900);
+  msgs.forEach((m,i)=>setTimeout(()=>{lbl.textContent=m[0];sub.textContent=m[1];},i*600));
+  data.attrs.forEach((a,i)=>setTimeout(()=>{const c=document.createElement('div');c.className='attr';c.textContent=a;attrs.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));},800+i*250));
+  setTimeout(()=>{showTwinResults(style);go('s-twin-results');},2900);
 }
 function showTwinResults(style){
   const data=twinData[style];
@@ -944,7 +1036,7 @@ function showTwinResults(style){
 }
 function selBudget(t){
   twinBudget=t;
-  ['b','m','p'].forEach(x=>{ const el=document.getElementById('bt-'+x); el.className='btab '+x+(x===t?' ab':''); });
+  ['b','m','p'].forEach(x=>{const el=document.getElementById('bt-'+x);el.className='btab '+x+(x===t?' ab':'');});
   const tier=twinData[twinStyle][t];
   const desc={b:'לוק מלא בתקציב נוח',m:'איכות טובה במחיר הוגן',p:'חווית מותג פרמיום'}[t];
   document.getElementById('twinLookPanel').innerHTML=`
@@ -959,8 +1051,28 @@ function selBudget(t){
         <div class="litem-price" style="color:${tier.c}">₪${it.price}</div>
       </div>`).join('')}</div>
     <div class="insp-note"><span>💡</span><span>לוק <strong>בהשראת</strong> הסגנון — לא עתק מדויק. כל פריט נבחר לשחזר את הויב בצורה ייחודית לך.</span></div>
-    <button class="buy-btn" style="background:${tier.c};color:#fff" onclick="alert('🛍️ קונה לוק מלא! ₪${tier.total.toLocaleString()}')">🛒 קנה את הלוק המלא · ₪${tier.total.toLocaleString()}</button>`;
+    <button class="buy-btn" style="background:${tier.c};color:#fff" onclick="showToast('🛒 קונה לוק! ₪${tier.total.toLocaleString()}')">🛒 קנה את הלוק המלא · ₪${tier.total.toLocaleString()}</button>`;
 }
+
+// ══════════════════ WARDROBE FILTER ══════════════════
+function setFilter(el,cat){
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  // In a real app, filter the grid. Here just toast.
+  if(cat!=='all') showToast('מציג '+el.textContent);
+}
+
+// ── Bottom-nav clone to all screens ───────────────
+// Build a shared nav and append to every screen
+(function(){
+  const navHTML=document.querySelector('.bottom-nav').outerHTML;
+  document.querySelectorAll('.screen').forEach(s=>{
+    if(!s.querySelector('.bottom-nav')){
+      s.insertAdjacentHTML('beforeend',navHTML);
+    }
+  });
+  // After clone, sync active state on screen change
+})();
 </script>
 </body>
 </html>
