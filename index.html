@@ -390,12 +390,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="qcard" onclick="navTo('s-wardrobe','nav-wardrobe')">
         <div class="qcard-icon">👗</div>
         <div class="qcard-name">ארון</div>
-        <div class="qcard-sub">12 פריטים</div>
+        <div class="qcard-sub" id="homeWardrobeSub">12 פריטים</div>
       </div>
       <div class="qcard" onclick="navTo('s-wishlist','nav-wishlist')">
         <div class="qcard-icon">❤️</div>
         <div class="qcard-name">Wishlist</div>
-        <div class="qcard-sub">5 פריטים</div>
+        <div class="qcard-sub" id="homeWishlistSub">5 פריטים</div>
       </div>
     </div>
 
@@ -414,12 +414,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
       <div class="stat-card">
         <div class="stat-icon">👗</div>
-        <div class="stat-val">12</div>
+        <div class="stat-val" id="homeWardrobeCount">12</div>
         <div class="stat-lbl">פריטים בארון</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">❤️</div>
-        <div class="stat-val">5</div>
+        <div class="stat-val" id="homeWishlistCount">5</div>
         <div class="stat-lbl">ב-Wishlist</div>
       </div>
     </div>
@@ -627,7 +627,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- ════════════════ WARDROBE ════════════════ -->
 <div class="screen" id="s-wardrobe">
   <div class="hdr hdr-simple">
-    <div style="flex:1"><h1>הארון שלי</h1><p>12 פריטים · 3 לוקים</p></div>
+    <div style="flex:1"><h1>הארון שלי</h1><p id="wardrobeHeader">12 פריטים · 3 לוקים</p></div>
     <div class="hdr-right">
       <button class="hdr-btn" onclick="showToast('הוספת פריט 📸')">+</button>
     </div>
@@ -636,14 +636,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <!-- stats -->
     <div class="wardrobe-hero">
       <div class="wardrobe-stats">
-        <div class="w-stat-num">12</div>
+        <div class="w-stat-num" id="wardrobeHeroNum">12</div>
         <div class="w-stat-lbl">פריטים בארון</div>
       </div>
       <div class="w-cats">
-        <div class="w-cat-row"><div class="w-cat-dot" style="background:#6366f1"></div><span class="w-cat-lbl">חולצות</span><span class="w-cat-num">4</span></div>
-        <div class="w-cat-row"><div class="w-cat-dot" style="background:#ec4899"></div><span class="w-cat-lbl">מכנסיים</span><span class="w-cat-num">3</span></div>
-        <div class="w-cat-row"><div class="w-cat-dot" style="background:#f59e0b"></div><span class="w-cat-lbl">נעליים</span><span class="w-cat-num">3</span></div>
-        <div class="w-cat-row"><div class="w-cat-dot" style="background:#10b981"></div><span class="w-cat-lbl">אביזרים</span><span class="w-cat-num">2</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#6366f1"></div><span class="w-cat-lbl">חולצות</span><span class="w-cat-num" id="catTops">4</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#ec4899"></div><span class="w-cat-lbl">מכנסיים</span><span class="w-cat-num" id="catBottoms">3</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#f59e0b"></div><span class="w-cat-lbl">נעליים</span><span class="w-cat-num" id="catFootwear">3</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#10b981"></div><span class="w-cat-lbl">אביזרים</span><span class="w-cat-num" id="catAccessories">2</span></div>
       </div>
     </div>
 
@@ -659,18 +659,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <!-- grid -->
     <div class="section-hdr"><span class="section-title">הפריטים שלי</span></div>
     <div class="wardrobe-grid" id="wardrobeGrid">
-      <div class="witem"><div class="witem-img" style="background:#eff6ff">👕</div><div class="witem-info"><div class="witem-name">Nike Club Tee</div><div class="witem-meta">Navy · חולצת טי</div></div><div class="witem-badge">×3</div></div>
-      <div class="witem"><div class="witem-img" style="background:#f0fdf4">👟</div><div class="witem-info"><div class="witem-name">Stan Smith</div><div class="witem-meta">White · סניקרס</div></div></div>
-      <div class="witem"><div class="witem-img" style="background:#faf5ff">👖</div><div class="witem-info"><div class="witem-name">Levi's 511</div><div class="witem-meta">Dark Indigo · ג'ינס</div></div></div>
-      <div class="witem"><div class="witem-img" style="background:#fff7ed">🧥</div><div class="witem-info"><div class="witem-name">Slim Blazer</div><div class="witem-meta">Navy · ג'קט</div></div></div>
-      <div class="witem"><div class="witem-img" style="background:#fdf2f8">👔</div><div class="witem-info"><div class="witem-name">Oxford Shirt</div><div class="witem-meta">White · פורמלי</div></div></div>
-      <div class="witem"><div class="witem-img" style="background:#f0fdf4">🧢</div><div class="witem-info"><div class="witem-name">Snapback</div><div class="witem-meta">Black · כובע</div></div></div>
-      <div class="witem"><div class="witem-img" style="background:#fef3c7">👞</div><div class="witem-info"><div class="witem-name">Derby Shoes</div><div class="witem-meta">Brown · נעל</div></div></div>
-      <div class="witem"><div class="witem-img" style="background:#eff6ff">🩳</div><div class="witem-info"><div class="witem-name">Chino Shorts</div><div class="witem-meta">Beige · מכנסיים</div></div></div>
-      <div class="add-witem" onclick="showToast('צלם פריט חדש 📸')">
-        <div class="add-icon">＋</div>
-        <div class="add-lbl">הוסף פריט</div>
-      </div>
+      <!-- rendered by JS -->
     </div>
 
     <!-- outfit suggestion -->
@@ -694,13 +683,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- ════════════════ WISHLIST ════════════════ -->
 <div class="screen" id="s-wishlist">
   <div class="hdr hdr-simple">
-    <div style="flex:1"><h1>Wishlist</h1><p>5 פריטים שמורים</p></div>
+    <div style="flex:1"><h1>Wishlist</h1><p id="wishlistHeader">5 פריטים שמורים</p></div>
   </div>
   <div class="scr-body" style="padding-top:16px;">
     <div class="wish-banner">
       <div class="wish-banner-h">❤️ הרשימה שלי</div>
       <div class="wish-banner-sub">אנחנו עוקבים אחרי המחירים ונודיע כשיירד</div>
-      <div class="wish-banner-stat">₪1,547</div>
+      <div class="wish-banner-stat" id="wishlistBannerTotal">₪1,547</div>
       <div class="wish-banner-stat-lbl">שווי כולל ב-Wishlist</div>
     </div>
 
@@ -712,87 +701,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       </div>
     </div>
 
-    <div class="wish-list">
-      <div class="wish-item">
-        <div class="wish-item-img" style="background:#eff6ff">👟</div>
-        <div class="wish-item-info">
-          <div class="wish-item-name">Nike Air Force 1</div>
-          <div class="wish-item-store">Nike · לבן</div>
-          <div class="wish-price-row">
-            <span class="wish-price">₪449</span>
-            <span class="wish-price-orig">₪519</span>
-            <span class="wish-badge">-13%</span>
-          </div>
-        </div>
-        <div class="wish-actions">
-          <button class="wish-buy" onclick="showToast('פותח Nike ↗')">קנה</button>
-          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
-        </div>
-      </div>
-
-      <div class="wish-item">
-        <div class="wish-item-img" style="background:#faf5ff">🧥</div>
-        <div class="wish-item-info">
-          <div class="wish-item-name">Arc'teryx Shell Jacket</div>
-          <div class="wish-item-store">Arc'teryx · שחור</div>
-          <div class="wish-price-row">
-            <span class="wish-price">₪799</span>
-            <span class="wish-badge alert">יקר עדיין</span>
-          </div>
-        </div>
-        <div class="wish-actions">
-          <button class="wish-buy" onclick="showToast('פותח Arc\'teryx ↗')">קנה</button>
-          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
-        </div>
-      </div>
-
-      <div class="wish-item">
-        <div class="wish-item-img" style="background:#fef3c7">⌚</div>
-        <div class="wish-item-info">
-          <div class="wish-item-name">Casio G-Shock</div>
-          <div class="wish-item-store">Casio · שחור</div>
-          <div class="wish-price-row">
-            <span class="wish-price">₪149</span>
-            <span class="wish-badge">מחיר טוב!</span>
-          </div>
-        </div>
-        <div class="wish-actions">
-          <button class="wish-buy" onclick="showToast('פותח Casio ↗')">קנה</button>
-          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
-        </div>
-      </div>
-
-      <div class="wish-item">
-        <div class="wish-item-img" style="background:#f0fdf4">👖</div>
-        <div class="wish-item-info">
-          <div class="wish-item-name">Carhartt Wide Cargo</div>
-          <div class="wish-item-store">Carhartt · חאקי</div>
-          <div class="wish-price-row">
-            <span class="wish-price">₪329</span>
-          </div>
-        </div>
-        <div class="wish-actions">
-          <button class="wish-buy" onclick="showToast('פותח Carhartt ↗')">קנה</button>
-          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
-        </div>
-      </div>
-
-      <div class="wish-item">
-        <div class="wish-item-img" style="background:#fdf2f8">👜</div>
-        <div class="wish-item-info">
-          <div class="wish-item-name">Gorjana Necklace Set</div>
-          <div class="wish-item-store">Gorjana · זהב</div>
-          <div class="wish-price-row">
-            <span class="wish-price">₪169</span>
-            <span class="wish-price-orig">₪199</span>
-            <span class="wish-badge">-15%</span>
-          </div>
-        </div>
-        <div class="wish-actions">
-          <button class="wish-buy" onclick="showToast('פותח Gorjana ↗')">קנה</button>
-          <button class="wish-remove" onclick="showToast('הוסר ❌')">הסר</button>
-        </div>
-      </div>
+    <div class="wish-list" id="wishList">
+      <!-- rendered by JS -->
     </div>
   </div>
 </div>
@@ -872,6 +782,12 @@ window.addEventListener('load',function(){
   var gal=document.getElementById('snapGalleryFile');
   if(cam)cam.addEventListener('change',handleSnap);
   if(gal)gal.addEventListener('change',handleSnap);
+
+  // טעינת נתונים שמורים
+  loadFromStorage();
+  renderWardrobe();
+  renderWishlist();
+  updateStats();
 });
 
 function handleSnap(e){
@@ -1054,12 +970,130 @@ function selBudget(t){
     <button class="buy-btn" style="background:${tier.c};color:#fff" onclick="showToast('🛒 קונה לוק! ₪${tier.total.toLocaleString()}')">🛒 קנה את הלוק המלא · ₪${tier.total.toLocaleString()}</button>`;
 }
 
+// ══════════════════ PERSISTENCE (localStorage) ══════════════════
+const DEFAULT_WARDROBE=[
+  {id:1,emoji:'👕',bg:'#eff6ff',name:'Nike Club Tee',meta:"Navy · חולצת טי",cat:'tops',badge:'×3'},
+  {id:2,emoji:'👟',bg:'#f0fdf4',name:'Stan Smith',meta:'White · סניקרס',cat:'footwear'},
+  {id:3,emoji:'👖',bg:'#faf5ff',name:"Levi's 511",meta:"Dark Indigo · ג'ינס",cat:'bottoms'},
+  {id:4,emoji:'🧥',bg:'#fff7ed',name:'Slim Blazer',meta:"Navy · ג'קט",cat:'tops'},
+  {id:5,emoji:'👔',bg:'#fdf2f8',name:'Oxford Shirt',meta:'White · פורמלי',cat:'tops'},
+  {id:6,emoji:'🧢',bg:'#f0fdf4',name:'Snapback',meta:'Black · כובע',cat:'accessories'},
+  {id:7,emoji:'👞',bg:'#fef3c7',name:'Derby Shoes',meta:'Brown · נעל',cat:'footwear'},
+  {id:8,emoji:'🩳',bg:'#eff6ff',name:'Chino Shorts',meta:"Beige · מכנסיים",cat:'bottoms'},
+];
+const DEFAULT_WISHLIST=[
+  {id:1,emoji:'👟',bg:'#eff6ff',name:'Nike Air Force 1',store:'Nike · לבן',price:449,orig:519,discount:'-13%'},
+  {id:2,emoji:'🧥',bg:'#faf5ff',name:"Arc'teryx Shell Jacket",store:"Arc'teryx · שחור",price:799,alert:'יקר עדיין'},
+  {id:3,emoji:'⌚',bg:'#fef3c7',name:'Casio G-Shock',store:'Casio · שחור',price:149,badge:'מחיר טוב!'},
+  {id:4,emoji:'👖',bg:'#f0fdf4',name:'Carhartt Wide Cargo',store:'Carhartt · חאקי',price:329},
+  {id:5,emoji:'👜',bg:'#fdf2f8',name:'Gorjana Necklace Set',store:'Gorjana · זהב',price:169,orig:199,discount:'-15%'},
+];
+
+let wardrobeItems=[...DEFAULT_WARDROBE];
+let wishlistItems=[...DEFAULT_WISHLIST];
+
+function saveToStorage(){
+  try{
+    localStorage.setItem('styleSnap_wardrobe',JSON.stringify(wardrobeItems));
+    localStorage.setItem('styleSnap_wishlist',JSON.stringify(wishlistItems));
+  }catch(e){}
+}
+
+function loadFromStorage(){
+  try{
+    const w=localStorage.getItem('styleSnap_wardrobe');
+    const wl=localStorage.getItem('styleSnap_wishlist');
+    if(w) wardrobeItems=JSON.parse(w);
+    if(wl) wishlistItems=JSON.parse(wl);
+  }catch(e){}
+}
+
+function updateStats(){
+  const wc=wardrobeItems.length;
+  const wlc=wishlistItems.length;
+  const wlTotal=wishlistItems.reduce((s,i)=>s+i.price,0);
+
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  set('homeWardrobeCount',wc);
+  set('homeWishlistCount',wlc);
+  set('homeWardrobeSub',wc+' פריטים');
+  set('homeWishlistSub',wlc+' פריטים');
+  set('wardrobeHeader',wc+' פריטים · 3 לוקים');
+  set('wardrobeHeroNum',wc);
+  set('wishlistHeader',wlc+' פריטים שמורים');
+  set('wishlistBannerTotal','₪'+wlTotal.toLocaleString());
+
+  const cats={tops:0,bottoms:0,footwear:0,accessories:0};
+  wardrobeItems.forEach(i=>{if(cats[i.cat]!==undefined)cats[i.cat]++;});
+  set('catTops',cats.tops);
+  set('catBottoms',cats.bottoms);
+  set('catFootwear',cats.footwear);
+  set('catAccessories',cats.accessories);
+}
+
+let currentWardrobeFilter='all';
+
+function renderWardrobe(filter){
+  if(filter!==undefined) currentWardrobeFilter=filter;
+  const grid=document.getElementById('wardrobeGrid');
+  if(!grid) return;
+  const filtered=currentWardrobeFilter==='all'?wardrobeItems:wardrobeItems.filter(i=>i.cat===currentWardrobeFilter);
+  grid.innerHTML=filtered.map(item=>`
+    <div class="witem" onclick="showToast('${item.name}')">
+      <div class="witem-img" style="background:${item.bg}">${item.emoji}</div>
+      <div class="witem-info">
+        <div class="witem-name">${item.name}</div>
+        <div class="witem-meta">${item.meta}</div>
+      </div>
+      ${item.badge?`<div class="witem-badge">${item.badge}</div>`:''}
+    </div>`).join('')+`
+    <div class="add-witem" onclick="showToast('צלם פריט חדש 📸')">
+      <div class="add-icon">＋</div>
+      <div class="add-lbl">הוסף פריט</div>
+    </div>`;
+}
+
+function renderWishlist(){
+  const list=document.getElementById('wishList');
+  if(!list) return;
+  if(wishlistItems.length===0){
+    list.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">❤️</div><div style="font-size:14px;font-weight:600">הרשימה ריקה</div><div style="font-size:12px;margin-top:4px">הוסף פריטים מה-Snap</div></div>';
+    return;
+  }
+  list.innerHTML=wishlistItems.map(item=>`
+    <div class="wish-item">
+      <div class="wish-item-img" style="background:${item.bg}">${item.emoji}</div>
+      <div class="wish-item-info">
+        <div class="wish-item-name">${item.name}</div>
+        <div class="wish-item-store">${item.store}</div>
+        <div class="wish-price-row">
+          <span class="wish-price">₪${item.price}</span>
+          ${item.orig?`<span class="wish-price-orig">₪${item.orig}</span>`:''}
+          ${item.discount?`<span class="wish-badge">${item.discount}</span>`:''}
+          ${item.alert?`<span class="wish-badge alert">${item.alert}</span>`:''}
+          ${item.badge&&!item.discount&&!item.alert?`<span class="wish-badge">${item.badge}</span>`:''}
+        </div>
+      </div>
+      <div class="wish-actions">
+        <button class="wish-buy" onclick="showToast('פותח ${item.name} ↗')">קנה</button>
+        <button class="wish-remove" onclick="removeWishlistItem(${item.id})">הסר</button>
+      </div>
+    </div>`).join('');
+}
+
+function removeWishlistItem(id){
+  wishlistItems=wishlistItems.filter(i=>i.id!==id);
+  saveToStorage();
+  renderWishlist();
+  updateStats();
+  showToast('הוסר ❌');
+}
+
 // ══════════════════ WARDROBE FILTER ══════════════════
 function setFilter(el,cat){
   document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  // In a real app, filter the grid. Here just toast.
-  if(cat!=='all') showToast('מציג '+el.textContent);
+  renderWardrobe(cat);
 }
 
 // ── Bottom-nav clone to all screens ───────────────
