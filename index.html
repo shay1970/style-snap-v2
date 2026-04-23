@@ -789,11 +789,37 @@ let snapItems=[
   {id:3,type:'סניקרס',cat:'footwear',color:'White',hex:'#f9fafb',brand:'Adidas',style:'Sport',gender:'יוניסקס',conf:.88},
 ];
 const catIcons={tops:'👕',bottoms:'👖',footwear:'👟',accessories:'⌚',default:'👔'};
-const snapProds={
-  1:{featured:[{name:'Nike Club Tee',store:'Nike',price:139,emoji:'👕',bg:'#eff6ff'},{name:'Essential Tee',store:'H&M',price:89,orig:129,emoji:'👔',bg:'#f0fdf4',sp:true}],more:[{name:'Premium Crew',store:'Nordstrom',price:179,e:'🏷️',bg:'#f9f9f9'},{name:'Athletic Tee',store:'UA',price:109,e:'💪',bg:'#fff'},{name:'Organic Tee',store:'Uniqlo',price:79,e:'🌿',bg:'#f9f9f9'},{name:'Classic Fit',store:'Gap',price:99,e:'🏷️',bg:'#fff'},{name:'DriFit',store:'Nike',price:149,e:'⚡',bg:'#eff6ff'},{name:'Everyday',store:'Zara',price:89,e:'✨',bg:'#faf5ff'}]},
-  2:{featured:[{name:"Levi's 511 Slim",store:"Levi's",price:269,emoji:'👖',bg:'#eff6ff'},{name:'Athletic Slim',store:'AE',price:229,orig:299,emoji:'🦅',bg:'#fff7ed',sp:true}],more:[{name:'Skinny Stretch',store:'Zara',price:189,e:'✨',bg:'#faf5ff'},{name:'Premium Selvedge',store:'J.Crew',price:499,e:'🎀',bg:'#fff'},{name:'Comfort Slim',store:'Old Navy',price:149,e:'⚓',bg:'#f9f9f9'},{name:'Modern Dark',store:'BR',price:349,e:'🍌',bg:'#fff'},{name:'Tapered',store:'H&M',price:129,e:'👔',bg:'#eff6ff'},{name:'Straight Cut',store:'Uniqlo',price:189,e:'🌿',bg:'#f0fdf4'}]},
-  3:{featured:[{name:'Adidas Stan Smith',store:'Adidas',price:369,emoji:'⚽',bg:'#f0fdf4'},{name:'Nike Air Force 1',store:'Nike',price:449,emoji:'🏃',bg:'#eff6ff',sp:true}],more:[{name:'Classic Leather',store:'Reebok',price:289,e:'🏋️',bg:'#fff'},{name:'Chuck Taylor',store:'Converse',price:249,e:'⭐',bg:'#f9f9f9'},{name:'Old Skool',store:'Vans',price:269,e:'🛹',bg:'#fff'},{name:'Suede Classic',store:'Puma',price:299,e:'🐆',bg:'#faf5ff'},{name:'Fresh Foam',store:'NB',price:339,e:'🔵',bg:'#eff6ff'},{name:'Gel-Lite',store:'Asics',price:389,e:'🏃',bg:'#f9f9f9'}]},
+// ══════ REAL STORE LINKS (Approach A — no API needed) ══════
+const STORES=[
+  {name:'ASOS',emoji:'🛍️',bg:'#000',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www.asos.com/search/?q='+encodeURIComponent(q);}},
+  {name:'H&M',emoji:'🏪',bg:'#e50010',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www2.hm.com/en_gb/search-results.html?q='+encodeURIComponent(q);}},
+  {name:'Zara',emoji:'✨',bg:'#1a1a1a',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www.zara.com/il/en/search?searchTerm='+encodeURIComponent(q);}},
+  {name:'Nike',emoji:'✔️',bg:'#111',fg:'#fff',cats:['tops','footwear','bottoms'],url:function(q){return'https://www.nike.com/il/search?q='+encodeURIComponent(q);}},
+  {name:'Adidas',emoji:'🏃',bg:'#000',fg:'#fff',cats:['tops','footwear','bottoms'],url:function(q){return'https://www.adidas.co.il/search?q='+encodeURIComponent(q);}},
+  {name:'Fox',emoji:'🦊',bg:'#e85d04',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www.fox.co.il/search/?q='+encodeURIComponent(q);}},
+  {name:'Castro',emoji:'💜',bg:'#6b21a8',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www.castro.com/catalogsearch/result/?q='+encodeURIComponent(q);}},
+  {name:'Shein',emoji:'💕',bg:'#e91e8c',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://il.shein.com/pdsearch/'+encodeURIComponent(q)+'/';}},
+];
+const typeToEn={
+  'חולצת טי':'t-shirt',"ג'ינס":'jeans','סניקרס':'sneakers',
+  'מכנסיים':'pants','שמלה':'dress','חצאית':'skirt',
+  "ג'קט":'jacket',"ז'קט":'jacket','מעיל':'coat','חולצה':'shirt',
+  'נעלי ספורט':'sport shoes','מגפיים':'boots','סנדלים':'sandals',
+  'כובע':'hat','תיק':'bag','אביזר':'accessory',
+  'חולצת אוברסייז':'oversized shirt','מכנסי קארגו':'cargo pants',
+  'נעלי פלטפורמה':'platform shoes','ברמודה':'shorts',
+  'מכנסי טרנינג':'sweatpants','גופיה':'tank top',
 };
+function buildSearchQuery(item){
+  var type=item.type?(typeToEn[item.type]||item.type):'clothing';
+  var parts=[type];
+  if(item.color)parts.push(item.color);
+  if(item.brand&&item.brand!=='unknown'&&item.brand!=='לא ידוע')parts.push(item.brand);
+  return parts.join(' ');
+}
+function getStoresForCategory(cat){
+  return STORES.filter(function(s){return s.cats.indexOf(cat||'tops')>=0;});
+}
 let snapImgUrl=null;
 
 window.addEventListener('load',function(){
@@ -878,20 +904,41 @@ function showSnapDetected(){
   });
 }
 function showSnapProducts(id){
-  const item=snapItems.find(i=>i.id===id),data=snapProds[id]||snapProds[1];
+  var item=snapItems.find(function(i){return i.id===id;});
   document.getElementById('snapProdSub').textContent=[item.type,item.color,item.brand].filter(Boolean).join(' · ');
-  document.getElementById('snapTopGrid').innerHTML=data.featured.map((p,i)=>`
-    <div class="pcard" style="position:relative">
-      <div class="pcard-lbl">${p.sp?'<span class="spons">ממומן</span>':''}${i===0?'⭐ הכי מתאים':'🔄 דומה'}</div>
-      <div class="pimg" style="background:${p.bg}">${p.emoji}</div>
-      <div class="pinfo"><div class="pname">${p.name}</div><div class="pstore">${p.store}</div>
-      <div><span class="pprice">₪${p.price}</span>${p.orig?`<span class="porig">₪${p.orig}</span>`:''}</div></div>
-      <button class="pbtn" onclick="showToast('פותח ${p.name} ↗')">צפה במוצר ↗</button>
-      <button class="wish-btn" onclick="event.stopPropagation();showToast('נוסף ל-Wishlist ❤️')">❤️</button>
-    </div>`).join('');
-  document.getElementById('snapMoreGrid').innerHTML=data.more.map(p=>`
-    <div class="pmini" onclick="showToast('פותח ${p.name} ↗')"><div class="pmini-img" style="background:${p.bg}">${p.e}</div>
-    <div class="pmini-body"><div class="pmini-name">${p.name}</div><div class="pmini-store">${p.store}</div><div class="pmini-price">₪${p.price}</div></div></div>`).join('');
+  var q=buildSearchQuery(item);
+  var stores=getStoresForCategory(item.cat);
+  var featured=stores.slice(0,2);
+  var more=stores.slice(2);
+  var labels=['⭐ הכי מתאים','🔄 חלופה'];
+  document.getElementById('snapTopGrid').innerHTML=featured.map(function(s,i){
+    return'<div class="pcard" style="position:relative">'+
+      '<div class="pcard-lbl">'+labels[i]+'</div>'+
+      '<div class="pimg" style="background:'+s.bg+';color:'+s.fg+';font-size:22px;font-weight:900;letter-spacing:-0.5px;flex-direction:column;gap:4px">'+
+        '<span>'+s.emoji+'</span><span style="font-size:14px">'+s.name+'</span>'+
+      '</div>'+
+      '<div class="pinfo"><div class="pname">'+item.type+(item.color?' · '+item.color:'')+'</div>'+
+      '<div class="pstore">חיפוש חי ב-'+s.name+'</div>'+
+      '<div><span class="pprice" style="font-size:12px;color:var(--muted)">תוצאות אמיתיות 🔴</span></div></div>'+
+      '<a href="'+s.url(q)+'" target="_blank" style="display:block;padding:0 12px 12px">'+
+        '<button class="pbtn" style="width:100%">חפש ב-'+s.name+' ↗</button>'+
+      '</a>'+
+    '</div>';
+  }).join('');
+  document.getElementById('snapMoreGrid').innerHTML=more.map(function(s){
+    return'<a href="'+s.url(q)+'" target="_blank" style="text-decoration:none">'+
+      '<div class="pmini">'+
+        '<div class="pmini-img" style="background:'+s.bg+';color:'+s.fg+';font-size:13px;font-weight:900;flex-direction:column;gap:2px">'+
+          '<span style="font-size:18px">'+s.emoji+'</span><span>'+s.name+'</span>'+
+        '</div>'+
+        '<div class="pmini-body">'+
+          '<div class="pmini-name">'+item.type+'</div>'+
+          '<div class="pmini-store">'+s.name+'</div>'+
+          '<div class="pmini-price">חפש ↗</div>'+
+        '</div>'+
+      '</div>'+
+    '</a>';
+  }).join('');
   go('s-snap-products');
 }
 
@@ -929,15 +976,29 @@ function renderSocialChips(){
     </div>`).join('');
 }
 function renderSocialShop(id){
-  const item=socialItems.find(i=>i.id===id);
-  document.getElementById('socialShop').innerHTML=`
-    <div class="shop-lbl">🛍️ פריט ${item.n} <span>· ${item.name}</span></div>
-    <div class="prod-g3">${item.prods.map(p=>`
-      <div class="prd" onclick="showToast('פותח ${p.name} ↗')">
-        <div class="prd-img" style="background:${p.bg}">${p.e}</div>
-        <div class="prd-bd"><div class="prd-nm">${p.name}</div><div class="prd-st">${p.store}</div><div class="prd-pr">₪${p.price}</div></div>
-      </div>`).join('')}</div>
-    <button class="stl-btn" onclick="showToast('🛍️ Shop the Full Look!')">🌟 Shop the Full Look</button>`;
+  var item=socialItems.find(function(i){return i.id===id;});
+  var subParts=item.sub?item.sub.split(' · '):[];
+  var color=subParts[0]||'';
+  var fakeItem={type:item.name,color:color,cat:'tops',brand:''};
+  var q=buildSearchQuery(fakeItem);
+  var stores=STORES.slice(0,3);
+  document.getElementById('socialShop').innerHTML=
+    '<div class="shop-lbl">🛍️ פריט '+item.n+' <span>· '+item.name+'</span></div>'+
+    '<div class="prod-g3">'+stores.map(function(s){
+      return'<a href="'+s.url(q)+'" target="_blank" style="text-decoration:none">'+
+        '<div class="prd">'+
+          '<div class="prd-img" style="background:'+s.bg+';color:'+s.fg+';font-size:13px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px">'+
+            '<span style="font-size:20px">'+s.emoji+'</span><span>'+s.name+'</span>'+
+          '</div>'+
+          '<div class="prd-bd">'+
+            '<div class="prd-nm">'+item.name+'</div>'+
+            '<div class="prd-st">'+s.name+'</div>'+
+            '<div class="prd-pr">חפש ↗</div>'+
+          '</div>'+
+        '</div>'+
+      '</a>';
+    }).join('')+'</div>'+
+    '<button class="stl-btn" onclick="showToast(\'🛍️ Shop the Full Look!\')">🌟 Shop the Full Look</button>';
 }
 function selSocial(id){
   socialActive=id;
