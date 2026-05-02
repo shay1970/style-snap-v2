@@ -1,122 +1,35 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { AnimatePresence } from 'framer-motion'
+import { BottomNav } from './components/BottomNav'
+import { HomeScreen } from './components/HomeScreen'
+import { SnapScreen } from './components/SnapScreen'
+import { SocialScreen } from './components/SocialScreen'
+import { TwinScreen } from './components/TwinScreen'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [activeTab, setActiveTab] = useState('home')
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-8" style={{ background: 'linear-gradient(135deg, #e8e0d0 0%, #f5f0e8 50%, #ede5d8 100%)' }}>
+      <div className="relative w-full max-w-[390px] h-[844px] bg-[#F5F0E8] rounded-[40px] shadow-2xl overflow-hidden border-[8px] border-white">
+        {/* Notch */}
+        <div className="absolute top-0 inset-x-0 h-7 flex justify-center z-50 pointer-events-none">
+          <div className="w-32 h-6 bg-black rounded-b-3xl" />
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        {/* Screens */}
+        <div className="relative w-full h-full">
+          <AnimatePresence mode="wait">
+            {activeTab === 'home' && <HomeScreen key="home" setActiveTab={setActiveTab} />}
+            {activeTab === 'snap' && <SnapScreen key="snap" setActiveTab={setActiveTab} />}
+            {activeTab === 'social' && <SocialScreen key="social" />}
+            {activeTab === 'twin' && <TwinScreen key="twin" />}
+          </AnimatePresence>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        {/* Bottom Nav */}
+        <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+      </div>
+    </div>
   )
 }
-
-export default App
