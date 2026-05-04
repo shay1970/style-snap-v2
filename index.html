@@ -452,46 +452,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 </div>
 
 <!-- Google Identity Services -->
-<script src="https://accounts.google.com/gsi/client" async>
-function checkPriceDrops(){
-  if(!wishlistItems||wishlistItems.length===0){updateWishlistBadge();return;}
-  var today=new Date().toISOString().slice(0,10);
-  var lastCheck=localStorage.getItem('styleSnap_priceCheck');
-  if(lastCheck===today){updateWishlistBadge();return;}
-  localStorage.setItem('styleSnap_priceCheck',today);
-  var dropsFound=0;
-  wishlistItems.forEach(function(item){
-    if(!item.basePrice)item.basePrice=item.price;
-    var rand=Math.random();
-    if(rand<0.35&&!item.discount){
-      var dropPct=Math.floor(Math.random()*20)+5;
-      var newPrice=Math.max(19,Math.round(item.basePrice*(1-dropPct/100)/5)*5);
-      item.orig=item.basePrice;
-      item.price=newPrice;
-      item.discount='-'+dropPct+'%';
-      delete item.alert;
-      dropsFound++;
-    } else if(rand>0.9&&!item.discount){
-      var risePct=Math.floor(Math.random()*10)+3;
-      item.price=Math.round(item.basePrice*(1+risePct/100)/5)*5;
-      item.alert='\u2b06 \u05e2\u05dc\u05d4';
-    }
-  });
-  if(dropsFound>0){
-    saveToStorage();renderWishlist();updateStats();
-    setTimeout(function(){showToast('\U0001f4b0 '+dropsFound+' \u05e4\u05e8\u05d9\u05d8\u05d9\u05dd \u05d9\u05e8\u05d3\u05d5 \u05d1\u05de\u05d7\u05d9\u05e8!');},1500);
-  }
-  updateWishlistBadge();
-}
-function updateWishlistBadge(){
-  var drops=wishlistItems?wishlistItems.filter(function(i){return i.discount;}).length:0;
-  document.querySelectorAll('.wish-nav-badge').forEach(function(b){
-    b.textContent=drops;
-    b.style.display=drops>0?'flex':'none';
-  });
-}
-
-</script>
+<script src="https://accounts.google.com/gsi/client" async></script>
 
 <!-- ════════════════ HOME ════════════════ -->
 <div class="screen active" id="s-home">
@@ -1995,6 +1956,44 @@ function setFilter(el,cat){
   });
   // After clone, sync active state on screen change
 })();
+
+function checkPriceDrops(){
+  if(!wishlistItems||wishlistItems.length===0){updateWishlistBadge();return;}
+  var today=new Date().toISOString().slice(0,10);
+  var lastCheck=localStorage.getItem('styleSnap_priceCheck');
+  if(lastCheck===today){updateWishlistBadge();return;}
+  localStorage.setItem('styleSnap_priceCheck',today);
+  var dropsFound=0;
+  wishlistItems.forEach(function(item){
+    if(!item.basePrice)item.basePrice=item.price;
+    var rand=Math.random();
+    if(rand<0.35&&!item.discount){
+      var dropPct=Math.floor(Math.random()*20)+5;
+      var newPrice=Math.max(19,Math.round(item.basePrice*(1-dropPct/100)/5)*5);
+      item.orig=item.basePrice;
+      item.price=newPrice;
+      item.discount='-'+dropPct+'%';
+      delete item.alert;
+      dropsFound++;
+    } else if(rand>0.9&&!item.discount){
+      var risePct=Math.floor(Math.random()*10)+3;
+      item.price=Math.round(item.basePrice*(1+risePct/100)/5)*5;
+      item.alert='⬆ עלה';
+    }
+  });
+  if(dropsFound>0){
+    saveToStorage();renderWishlist();updateStats();
+    setTimeout(function(){showToast('💰 '+dropsFound+' פריטים ירדו במחיר!');},1500);
+  }
+  updateWishlistBadge();
+}
+function updateWishlistBadge(){
+  var drops=wishlistItems?wishlistItems.filter(function(i){return i.discount;}).length:0;
+  document.querySelectorAll('.wish-nav-badge').forEach(function(b){
+    b.textContent=drops;
+    b.style.display=drops>0?'flex':'none';
+  });
+}
 </script>
 </body>
 </html>
