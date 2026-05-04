@@ -400,9 +400,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 
 <!-- ════════════════ ONBOARDING ════════════════ -->
 <div class="screen" id="s-onboarding" style="background:var(--bg);justify-content:space-between;">
-  <div style="padding:56px 0 0;display:flex;justify-content:flex-end;padding-right:24px;">
-    <button onclick="finishOnboarding()" style="font-size:13px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0;">דלג</button>
-  </div>
+  <div style="padding:56px 0 0;height:40px;"></div>
 
   <!-- Slides -->
   <div style="flex:1;position:relative;overflow:hidden;">
@@ -448,7 +446,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     <!-- Google Sign-In — מופיע בשקף 3 -->
     <div id="ob-google-btn" style="display:none;">
       <div id="google-signin-btn" style="width:100%;"></div>
-      <button onclick="finishOnboarding()" style="width:100%;padding:12px;margin-top:8px;background:transparent;border:none;font-size:13px;color:#666;cursor:pointer;font-family:inherit;">המשך ללא כניסה</button>
+
     </div>
   </div>
 </div>
@@ -626,7 +624,7 @@ function updateWishlistBadge(){
       <!-- Google sign-in — shown when not logged in -->
       <div id="psGoogleWrap" style="padding-bottom:8px;">
         <div id="google-signin-btn-profile" style="width:100%;min-height:44px;"></div>
-        <button onclick="closeProfileSheet()" style="width:100%;padding:11px;margin-top:8px;background:rgba(255,255,255,.05);border:1px solid #2A2A2A;border-radius:12px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;">המשך ללא כניסה</button>
+
       </div>
       <!-- Sign-out — shown when logged in -->
       <div id="psSignedIn" style="display:none;">
@@ -1107,11 +1105,17 @@ function obNext() {
 }
 
 function finishOnboarding() {
+  const savedUser = localStorage.getItem('snapstyle_user');
+  if (!savedUser) {
+    // חייב להתחבר — הצג הודעה והישאר בשקף הכניסה
+    obGoTo(2);
+    showToast('יש להתחבר עם Google כדי להמשיך 🔐');
+    return;
+  }
   localStorage.setItem('snapstyle_onboarding_done', '1');
   document.getElementById('s-onboarding').classList.remove('active');
   document.getElementById('s-home').classList.add('active');
-  const savedUser = localStorage.getItem('snapstyle_user');
-  if (savedUser) try { applyUserToUI(JSON.parse(savedUser)); } catch(e){}
+  try { applyUserToUI(JSON.parse(savedUser)); } catch(e){}
 }
 
 // ── Nav ───────────────────────────────────────────
@@ -1234,15 +1238,20 @@ window.addEventListener('load',function(){
   // Onboarding — הצג למשתמש חדש
   const onboardingDone = localStorage.getItem('snapstyle_onboarding_done');
   const savedUser = localStorage.getItem('snapstyle_user');
-  if (!onboardingDone) {
-    // משתמש חדש — הצג onboarding
+  if (!onboardingDone || !savedUser) {
+    // משתמש חדש או לא מחובר — חייב להתחבר
     document.getElementById('s-home').classList.remove('active');
     document.getElementById('s-onboarding').classList.add('active');
-    setTimeout(initGoogleSignIn, 1000);
+    if (!onboardingDone) {
+      setTimeout(initGoogleSignIn, 1000);
+    } else {
+      // היה רשום אבל יצא — קפוץ ישר לשקף הכניסה
+      obGoTo(2);
+      setTimeout(initGoogleSignIn, 300);
+    }
   } else {
-    // משתמש חוזר — המשך ישירות לבית
-    if (savedUser) try { applyUserToUI(JSON.parse(savedUser)); } catch(e){}
-    // Init Google in background so profile sheet is ready
+    // משתמש חוזר ומחובר — המשך ישירות לבית
+    try { applyUserToUI(JSON.parse(savedUser)); } catch(e){}
     setTimeout(initGoogleSignIn, 1500);
   }
 });
@@ -1276,6 +1285,16 @@ const DAILY_LIMIT = 5;
 
 function checkScanLimit() {
   const savedUser = localStorage.getItem('snapstyle_user');
+  if (!savedUser) {
+    // לא מחובר — חסום וחזור ל-onboarding
+    localStorage.removeItem('snapstyle_onboarding_done');
+    document.getElementById('s-home').classList.remove('active');
+    document.getElementById('s-onboarding').classList.add('active');
+    obGoTo(2);
+    setTimeout(initGoogleSignIn, 300);
+    showToast('יש להתחבר כדי לסרוק 🔐');
+    return false;
+  }
   if (savedUser) {
     try {
       const user = JSON.parse(savedUser);
