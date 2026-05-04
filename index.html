@@ -1,13 +1,1771 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>style-snap</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>SnapStyle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#FFFBF5;--card:#FFFFFF;--border:rgba(0,0,0,0.07);
+  --text:#1A1A1A;--muted:#8C7B6B;--subtle:#B8A99A;
+  --caramel:#C4956A;--caramel-light:rgba(196,149,106,0.12);--caramel-dark:#A07548;
+  --dark:#1A1A1A;
+  --shadow:0 2px 16px rgba(0,0,0,0.07);--shadow-md:0 6px 32px rgba(0,0,0,0.11);
+  --radius:16px;
+  --primary:#C4956A;--primary-light:rgba(196,149,106,0.12);--primary-dark:#A07548;
+  --gold:#C4956A;
+  --green:#4ade80;--green-bg:rgba(74,222,128,.1);--green-border:rgba(74,222,128,.25);
+  --blue:#60a5fa;--blue-bg:rgba(96,165,250,.1);--blue-border:rgba(96,165,250,.25);
+  --purple:#C4956A;--purple-bg:rgba(196,149,106,0.12);--purple-border:rgba(196,149,106,0.25);
+  --pink:#C4956A;
+}
+body{font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);display:flex;justify-content:center;padding:0;min-height:100vh;color:var(--text);}
+.phone{width:100%;max-width:480px;background:var(--bg);display:flex;flex-direction:column;position:relative;min-height:100vh;}
+.di{display:none;}
+@media(min-width:600px){body{background:#E8E0D8;}.phone{max-width:480px;}}
+.screen{display:none;flex-direction:column;flex:1;padding-top:0;}
+.screen.active{display:flex;}
+.scr-body{flex:1;overflow-y:auto;padding-bottom:88px;scrollbar-width:none;}
+.scr-body::-webkit-scrollbar{display:none;}
+
+/* Bottom Nav */
+.bottom-nav{height:76px;background:rgba(255,251,245,.97);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-around;padding:10px 8px 0;flex-shrink:0;position:sticky;bottom:0;z-index:50;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;cursor:pointer;border-radius:14px;transition:all .18s;border:none;background:transparent;color:var(--subtle);}
+.nav-item:active{background:var(--caramel-light);}
+.nav-icon-wrap{width:46px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:14px;transition:all .2s;}
+.nav-item.active .nav-icon-wrap{background:var(--caramel-light);}
+.nav-item.active{color:var(--caramel);}
+.nav-icon{stroke:currentColor;transition:all .2s;}
+.nav-label{font-size:9.5px;font-weight:600;letter-spacing:.3px;}
+.nav-item.active .nav-label{color:var(--caramel);}
+
+/* Header */
+.hdr{display:flex;align-items:center;padding:52px 20px 14px;gap:12px;background:var(--bg);}
+.hdr-simple{display:flex;align-items:center;padding:52px 20px 14px;gap:12px;background:var(--bg);}
+.hdr h1,.hdr-simple h1{font-family:'Playfair Display',serif;font-size:20px;font-weight:800;color:var(--text);line-height:1.2;}
+.hdr p,.hdr-simple p{font-size:12px;color:var(--muted);margin-top:2px;}
+.back{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px 8px 4px 0;line-height:1;font-family:inherit;}
+.hdr-right{margin-right:auto;}
+.hdr-btn{background:var(--caramel-light);color:var(--caramel);border:none;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+.prod-hdr-info{flex:1;}
+
+/* Toast */
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:#1A1A1A;color:#FFFBF5;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:600;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Onboarding */
+.ob-dot{width:6px;height:6px;border-radius:3px;background:var(--subtle);transition:all .3s;}
+.ob-dot.active{width:20px;background:var(--caramel);}
+
+/* HOME */
+.home-top{display:flex;align-items:center;justify-content:space-between;padding:56px 20px 0;}
+.home-greeting{font-size:13px;color:var(--muted);font-weight:500;}
+.home-title-row{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--text);line-height:1.1;}
+.home-avatar{width:44px;height:44px;border-radius:50%;background:var(--caramel-light);border:2px solid var(--caramel);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--caramel);font-weight:700;overflow:hidden;flex-shrink:0;}
+
+/* Hero Card */
+.hero-card{margin:20px 20px 0;border-radius:24px;background:linear-gradient(135deg,#2C1810 0%,#4A2C1A 50%,#6B3D2A 100%);padding:28px 24px;position:relative;overflow:hidden;cursor:pointer;}
+.hero-card::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 12px);pointer-events:none;}
+.hero-season{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(196,149,106,.8);margin-bottom:12px;}
+.hero-headline{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#FFFBF5;line-height:1.2;margin-bottom:8px;}
+.hero-headline span{color:var(--caramel);}
+.hero-sub{font-size:13px;color:rgba(255,251,245,.6);line-height:1.5;margin-bottom:20px;}
+.hero-cta{background:var(--caramel);color:#fff;border:none;padding:12px 22px;border-radius:30px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+/* Feature Grid */
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 20px 0;}
+.fcard{background:var(--card);border-radius:20px;padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .15s;border:1px solid var(--border);}
+.fcard:active{transform:scale(.97);}
+.fcard-icon{width:44px;height:44px;background:var(--caramel-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.fcard-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.fcard-sub{font-size:11px;color:var(--muted);}
+
+/* Stats */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px 20px 0;}
+.stat-card{background:var(--card);border-radius:16px;padding:14px 8px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border);}
+.stat-icon{width:32px;height:32px;background:var(--caramel-light);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;}
+.stat-val{font-size:18px;font-weight:800;color:var(--text);}
+.stat-lbl{font-size:10px;color:var(--muted);font-weight:500;margin-top:2px;}
+
+/* Section */
+.section-hdr{padding:20px 20px 8px;display:flex;align-items:center;justify-content:space-between;}
+.section-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--text);}
+.sec-lbl{font-size:12px;color:var(--muted);padding:8px 20px;}
+
+/* Recent */
+.recent-scroll{display:flex;gap:12px;padding:0 20px 4px;overflow-x:auto;scrollbar-width:none;}
+.recent-scroll::-webkit-scrollbar{display:none;}
+.rcard{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;width:72px;}
+.rcard-img{width:64px;height:64px;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.rcard-name{font-size:10px;font-weight:600;color:var(--text);text-align:center;line-height:1.3;}
+.rcard-price{font-size:9px;color:var(--muted);text-align:center;}
+
+/* Upload */
+.upload-area{margin:20px;border:2px dashed rgba(196,149,106,.3);border-radius:24px;padding:36px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;background:var(--card);transition:border-color .2s;box-shadow:var(--shadow);}
+.upload-area:active{border-color:var(--caramel);}
+.upl-icon{color:var(--caramel);}
+.upl-title{font-size:15px;font-weight:700;color:var(--text);}
+.upl-sub{font-size:12px;color:var(--muted);}
+.action-btn{display:block;width:calc(100% - 40px);margin:8px 20px;padding:15px;border-radius:16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;border:none;text-align:center;}
+.action-btn.primary{background:var(--caramel);color:#fff;}
+.action-btn.secondary{background:var(--caramel-light);color:var(--caramel);}
+
+/* Scan screens — DARK */
+#s-snap-scan,#s-social-scan{
+  background:repeating-linear-gradient(-45deg,#1C1A18,#1C1A18 14px,#232120 14px,#232120 28px);
+  display:flex;flex-direction:column;
+}
+#s-social-scan{background:#1A1A1A;}
+.scan-hdr{display:flex;align-items:center;justify-content:center;padding:16px 20px;height:60px;position:relative;flex-shrink:0;}
+.scan-hdr-title{font-size:17px;font-weight:700;color:#FFFBF5;letter-spacing:.2px;}
+.scan-hdr-x{position:absolute;right:20px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#FFFBF5;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;}
+.scan-frame{flex:1;margin:8px 24px;position:relative;border:1.5px dashed rgba(255,255,255,.18);border-radius:24px;overflow:hidden;}
+.scan-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s;}
+.scan-frame img.show{opacity:1;}
+.scan-frame-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px;}
+.scan-instr{padding:18px 20px 32px;text-align:center;font-size:14px;color:rgba(255,255,255,.4);letter-spacing:.2px;flex-shrink:0;}
+.scan-wrap{display:flex;flex-direction:column;align-items:center;padding:16px 20px;}
+.scan-img-box{width:240px;height:240px;border-radius:24px;background:#2A2A2A;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+#snapScanImg,#socialScanImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s;}
+#snapScanImg.show,#socialScanImg.show{opacity:1;}
+.scan-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:56px;}
+.scan-line{position:absolute;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--caramel),transparent);animation:scanAnim 2s ease-in-out infinite;}
+@keyframes scanAnim{0%{top:0;}100%{top:100%;}}
+.scan-corners .sc{position:absolute;width:28px;height:28px;border-color:var(--caramel);border-style:solid;}
+.sc.tl{top:0;right:0;border-width:3px 0 0 3px;}
+.sc.tr{top:0;left:0;border-width:3px 3px 0 0;}
+.sc.bl{bottom:0;right:0;border-width:0 0 3px 3px;}
+.sc.br{bottom:0;left:0;border-width:0 3px 3px 0;}
+.scan-lbl{font-size:18px;font-weight:700;color:#FFFBF5;}
+.scan-sub2{font-size:13px;color:#6B6057;margin-top:4px;margin-bottom:16px;}
+.step-list{width:100%;max-width:320px;}
+.step{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;font-size:13px;color:#6B6057;transition:all .3s;margin-bottom:6px;}
+.step.active{background:rgba(196,149,106,.15);color:#FFFBF5;}
+.step.done{color:#5A5A5A;}
+.spinner{width:16px;height:16px;border:2px solid rgba(196,149,106,.3);border-top-color:var(--caramel);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.err-overlay{position:absolute;inset:0;background:#1A1A1A;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10;padding:32px;}
+.err-overlay.show{display:flex;}
+.err-icon{font-size:48px;margin-bottom:12px;}
+.err-title{font-size:18px;font-weight:700;color:#FFFBF5;margin-bottom:8px;}
+.err-msg{font-size:13px;color:#6B6057;text-align:center;line-height:1.6;margin-bottom:20px;}
+.err-retry{background:var(--caramel);color:#fff;border:none;padding:12px 28px;border-radius:30px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+/* Detected */
+.thumb-wrap{margin:16px 20px 8px;border-radius:20px;overflow:hidden;background:var(--caramel-light);height:180px;position:relative;display:flex;align-items:center;justify-content:center;}
+#snapThumbImg{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.thumb-ph{font-size:48px;position:relative;z-index:1;}
+.thumb-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(26,26,26,.6),transparent);z-index:2;}
+.thumb-lbl{position:absolute;bottom:14px;right:16px;font-size:13px;font-weight:700;color:#FFFBF5;z-index:3;}
+.item-row{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.item-row:active{background:var(--caramel-light);}
+.swatch-wrap{position:relative;width:44px;height:44px;flex-shrink:0;}
+.swatch{width:44px;height:44px;border-radius:12px;border:2px solid rgba(0,0,0,.05);}
+.cat-ico{position:absolute;bottom:-4px;right:-4px;font-size:14px;}
+.item-info{flex:1;}
+.item-name-row{display:flex;align-items:center;gap:8px;}
+.iname{font-size:14px;font-weight:700;color:var(--text);}
+.cbadge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.cbadge.cg{background:#dcfce7;color:#16a34a;}
+.cbadge.cy{background:#fef9c3;color:#ca8a04;}
+.imeta{font-size:11px;color:var(--muted);margin-top:3px;}
+.shop-ico{font-size:16px;color:var(--caramel);}
+.item-row-add{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--caramel);background:var(--caramel-light);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.item-row-add.added{border-color:#16a34a;background:#dcfce7;}
+
+/* Products — editorial Store Cards */
+.top-grid{padding:16px 20px 0;}
+.store-card{background:var(--card);border-radius:20px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;}
+.store-card-badge{position:absolute;top:12px;right:12px;background:var(--caramel);color:#fff;font-size:9px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.3px;}
+.store-card-logo{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;flex-shrink:0;}
+.store-card-info{flex:1;min-width:0;}
+.store-card-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.store-card-desc{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.store-card-price{font-size:13px;font-weight:700;color:var(--caramel);margin-top:4px;}
+.store-card-btn{background:var(--caramel);color:#fff;border:none;padding:9px 16px;border-radius:30px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;}
+.more-lbl{padding:12px 20px 4px;font-size:13px;font-weight:700;color:var(--text);}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 20px 20px;}
+.pmini{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--border);}
+.pmini-img{height:80px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.pmini-body{padding:8px;}
+.pmini-name{font-size:10px;font-weight:600;color:var(--text);line-height:1.3;}
+.pmini-store{font-size:9px;color:var(--muted);margin-top:2px;}
+.pmini-price{font-size:10px;font-weight:700;color:var(--caramel);margin-top:2px;}
+@keyframes skelpulse{0%,100%{opacity:.5;}50%{opacity:1;}}
+
+/* Social */
+.src-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:8px 20px 0;}
+.src-card{background:var(--card);border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;border:1px solid var(--border);box-shadow:var(--shadow);}
+.src-ico{color:var(--caramel);}
+.src-name{font-size:13px;font-weight:700;color:var(--text);}
+.src-sub{font-size:11px;color:var(--muted);}
+.tag-wrap{margin:12px 20px;border-radius:20px;overflow:hidden;position:relative;background:var(--caramel-light);min-height:240px;display:flex;align-items:center;justify-content:center;}
+#socialTagImg{width:100%;height:auto;display:block;}
+.tag-ph{font-size:56px;}
+.dot{position:absolute;width:28px;height:28px;border-radius:50%;background:var(--caramel);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);transform:translate(-50%,-50%);}
+.dot.active{width:34px;height:34px;font-size:13px;}
+.chips-scroll{display:flex;gap:8px;padding:0 20px 4px;overflow-x:auto;scrollbar-width:none;}
+.chips-scroll::-webkit-scrollbar{display:none;}
+.chip{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border:1.5px solid var(--border);border-radius:30px;cursor:pointer;flex-shrink:0;}
+.chip.active{border-color:var(--caramel);background:var(--caramel-light);}
+.chip-num{width:20px;height:20px;border-radius:50%;background:var(--caramel);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+.chip-color{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+.chip-info{display:flex;flex-direction:column;}
+.chip-name{font-size:12px;font-weight:700;color:var(--text);}
+.chip-sub{font-size:10px;color:var(--muted);}
+.shop-sec{margin:8px 20px;background:var(--card);border-radius:20px;padding:16px;border:1px solid var(--border);}
+.shop-lbl{font-size:13px;font-weight:700;color:var(--text);}
+.shop-lbl span{color:var(--caramel);}
+.stl-btn{width:100%;padding:12px;background:var(--caramel);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.prod-g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.prd{border-radius:12px;overflow:hidden;background:var(--card);border:1px solid var(--border);}
+.prd-img{height:72px;display:flex;align-items:center;justify-content:center;}
+.prd-bd{padding:6px 8px;}
+.prd-nm{font-size:9px;font-weight:600;color:var(--text);line-height:1.3;}
+.prd-st{font-size:8px;color:var(--muted);}
+.prd-pr{font-size:9px;font-weight:700;color:var(--caramel);}
+
+/* Twin */
+.style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:4px 20px 20px;}
+.sty-ex{background:var(--card);border-radius:16px;padding:16px 8px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;border:1px solid var(--border);box-shadow:var(--shadow);transition:transform .15s;}
+.sty-ex:active{transform:scale(.96);}
+.sty-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.sty-name{font-size:11px;font-weight:700;color:var(--text);text-align:center;}
+.anl-wrap{display:flex;flex-direction:column;align-items:center;padding:20px;}
+.anl-img-rel{position:relative;margin-bottom:20px;}
+.anl-img-box{width:120px;height:120px;border-radius:50%;overflow:hidden;background:var(--caramel-light);display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+#twinAnlImg{width:100%;height:100%;object-fit:cover;}
+.anl-ph{font-size:48px;}
+.anl-ring{position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--caramel);opacity:.4;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.4;}50%{transform:scale(1.08);opacity:.8;}}
+.anl-lbl{font-size:18px;font-weight:700;color:var(--text);}
+.anl-sub{font-size:13px;color:var(--muted);margin-top:4px;margin-bottom:16px;}
+.anl-attrs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.attr{padding:6px 14px;border-radius:20px;background:var(--caramel-light);color:var(--caramel);font-size:12px;font-weight:600;opacity:0;transform:scale(.8);transition:all .3s;}
+.attr.show{opacity:1;transform:scale(1);}
+.id-card{display:flex;gap:14px;align-items:center;padding:16px 20px;background:var(--card);border-radius:20px;margin:16px 20px 12px;border:1px solid var(--border);box-shadow:var(--shadow);}
+.id-img{width:64px;height:64px;border-radius:50%;overflow:hidden;background:var(--caramel-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#twinIdImg{width:100%;height:100%;object-fit:cover;}
+.id-ph{font-size:28px;}
+.id-top{font-size:11px;color:var(--caramel);font-weight:700;}
+.id-sty{font-family:'Playfair Display',serif;font-size:18px;font-weight:800;color:var(--text);}
+.id-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.id-tag{font-size:9px;padding:3px 8px;background:var(--caramel-light);color:var(--caramel);border-radius:20px;font-weight:600;}
+.budget-tabs{display:flex;gap:8px;padding:0 20px 12px;}
+.btab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 4px;border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;background:var(--card);border:1.5px solid var(--border);color:var(--muted);transition:all .2s;}
+.btab.b.ab,.btab.m.ab,.btab.p.ab{background:var(--caramel-light);border-color:var(--caramel);color:var(--caramel);}
+.bico{font-size:14px;}
+.look-panel{margin:0 20px 20px;background:var(--card);border-radius:20px;padding:16px;border:1px solid var(--border);}
+.look-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.look-hdr-l h3{font-size:14px;font-weight:700;color:var(--text);}
+.look-hdr-l p{font-size:11px;color:var(--muted);}
+.total-tag{font-size:13px;font-weight:800;padding:6px 12px;border-radius:20px;}
+.look-items{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.litem{display:flex;align-items:center;gap:10px;}
+.litem-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.litem-info{flex:1;}
+.litem-name{font-size:13px;font-weight:600;color:var(--text);}
+.litem-store{font-size:11px;color:var(--muted);}
+.litem-price{font-size:13px;font-weight:800;}
+.insp-note{display:flex;gap:8px;background:var(--caramel-light);border-radius:12px;padding:10px 12px;font-size:11px;color:var(--muted);margin-bottom:12px;}
+.buy-btn{width:100%;padding:14px;border:none;border-radius:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+/* Wardrobe */
+.wardrobe-hero{margin:8px 20px 0;background:var(--card);border-radius:20px;padding:20px;display:flex;align-items:center;gap:16px;border:1px solid var(--border);box-shadow:var(--shadow);}
+.wardrobe-stats{text-align:center;flex-shrink:0;}
+.w-stat-num{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--caramel);}
+.w-stat-lbl{font-size:11px;color:var(--muted);}
+.w-cats{flex:1;}
+.w-cat-row{display:flex;align-items:center;gap:8px;padding:3px 0;}
+.w-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.w-cat-lbl{flex:1;font-size:12px;color:var(--muted);}
+.w-cat-num{font-size:12px;font-weight:700;color:var(--text);}
+.filter-tabs{display:flex;gap:6px;padding:12px 20px 4px;overflow-x:auto;scrollbar-width:none;}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.ftab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;background:var(--card);border:1.5px solid var(--border);color:var(--muted);flex-shrink:0;}
+.ftab.active{background:var(--caramel-light);border-color:var(--caramel);color:var(--caramel);}
+.wardrobe-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:8px 20px 0;}
+.witem{background:var(--card);border-radius:16px;overflow:hidden;border:1px solid var(--border);}
+.witem-img{height:140px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;background:var(--bg);}
+.witem-info{padding:10px 12px;}
+.witem-name{font-size:12px;font-weight:700;color:var(--text);}
+.witem-meta{font-size:10px;color:var(--muted);margin-top:2px;}
+.add-witem{background:var(--card);border-radius:16px;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;min-height:140px;}
+.add-icon{font-size:24px;color:var(--subtle);}
+.add-lbl{font-size:12px;color:var(--muted);font-weight:600;}
+.outfit-section{padding:16px 20px 0;}
+.outfit-card{background:var(--card);border-radius:20px;padding:16px;border:1px solid var(--border);}
+.outfit-title{font-size:14px;font-weight:700;color:var(--text);}
+.outfit-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+.outfit-pieces{display:flex;gap:8px;margin:12px 0;}
+.outfit-piece{width:48px;height:48px;background:var(--caramel-light);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.outfit-action{background:var(--caramel-light);color:var(--caramel);border:none;padding:10px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+
+/* Wishlist */
+.wish-banner{margin:8px 20px;background:linear-gradient(135deg,#2C1810,#4A2C1A);border-radius:20px;padding:20px;}
+.wish-banner-h{font-family:'Playfair Display',serif;font-size:18px;font-weight:800;color:#FFFBF5;}
+.wish-banner-sub{font-size:12px;color:rgba(255,251,245,.6);margin-top:4px;}
+.wish-banner-stat{font-size:28px;font-weight:900;color:var(--caramel);margin-top:12px;}
+.wish-banner-stat-lbl{font-size:11px;color:rgba(255,251,245,.5);}
+.price-track-banner{display:flex;align-items:center;gap:12px;margin:8px 20px;background:var(--card);border-radius:14px;padding:12px 16px;border:1px solid var(--border);}
+.ptb-icon{font-size:20px;}
+.ptb-h{font-size:13px;font-weight:700;color:var(--text);}
+.ptb-sub{font-size:11px;color:var(--muted);}
+.wish-list{padding:8px 20px 0;}
+.wish-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.wish-item-img{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.wish-item-info{flex:1;}
+.wish-item-name{font-size:13px;font-weight:700;color:var(--text);}
+.wish-item-store{font-size:11px;color:var(--muted);}
+.wish-price-row{display:flex;align-items:center;gap:6px;margin-top:4px;}
+.wish-price{font-size:13px;font-weight:800;color:var(--caramel);}
+.wish-price-orig{font-size:11px;color:var(--muted);text-decoration:line-through;}
+.wish-badge{font-size:9px;padding:2px 6px;border-radius:20px;background:var(--caramel-light);color:var(--caramel);font-weight:700;}
+.wish-badge.alert{background:#fef9c3;color:#ca8a04;}
+.wish-actions{display:flex;flex-direction:column;gap:4px;}
+.wish-buy{background:var(--caramel);color:#fff;border:none;padding:7px 12px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.wish-remove{background:none;border:none;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;text-align:center;}
+
+/* Profile Sheet */
+.profile-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;z-index:100;align-items:flex-end;justify-content:center;}
+.profile-overlay.show{display:flex;}
+.profile-sheet{background:var(--bg);border-radius:28px 28px 0 0;width:100%;max-width:480px;padding:20px;max-height:70vh;overflow-y:auto;}
+.ps-drag{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.ps-head{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.ps-avatar{width:56px;height:56px;border-radius:50%;background:var(--caramel-light);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden;}
+.ps-name{font-size:15px;font-weight:700;color:var(--text);}
+.ps-email{font-size:12px;color:var(--muted);}
+.ps-not-logged{font-size:14px;font-weight:600;color:var(--muted);}
+.ps-body{padding-bottom:12px;}
+.ps-row{display:flex;align-items:center;gap:12px;padding:12px 0;cursor:pointer;border-top:1px solid var(--border);}
+.ps-row-ico{width:36px;height:36px;border-radius:10px;background:rgba(239,68,68,.08);display:flex;align-items:center;justify-content:center;}
+.ps-row-lbl{font-size:14px;font-weight:600;}
+.cat-btn{padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;transition:all .2s;}
+.cat-btn.active{background:var(--caramel);color:#fff;border-color:var(--caramel);}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- ONBOARDING -->
+<div class="screen" id="s-onboarding" style="background:var(--bg);justify-content:space-between;">
+  <div style="padding:56px 0 0;"></div>
+  <div style="flex:1;position:relative;overflow:hidden;">
+    <div class="ob-slide" id="ob-0" style="display:flex;flex-direction:column;align-items:center;padding:20px 28px 0;text-align:center;">
+      <div style="width:210px;height:190px;border-radius:26px;background:linear-gradient(135deg,#2C1810,#4A2C1A);display:flex;align-items:center;justify-content:center;font-size:72px;position:relative;margin-bottom:28px;">
+        📸
+        <div style="position:absolute;bottom:12px;right:12px;background:var(--caramel);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">זוהה ✓</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--caramel);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">01 / 03</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:10px;">ראית בגד שאהבת?</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.65;">צלם אותו — SnapStyle תמצא לך בדיוק איפה לקנות אותו, ובאיזה מחיר.</div>
+    </div>
+    <div class="ob-slide" id="ob-1" style="display:none;flex-direction:column;align-items:center;padding:20px 28px 0;text-align:center;">
+      <div style="width:210px;height:190px;border-radius:26px;background:linear-gradient(135deg,#2C1810,#4A2C1A);display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;margin-bottom:28px;">
+        🧥👖👟
+        <div style="position:absolute;bottom:12px;right:12px;background:var(--caramel);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">8 פריטים</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--caramel);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">02 / 03</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:10px;">השלם את הלוק</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.65;">מצאת פריט שאהבת? SnapStyle תציע לך מה ללבוש איתו — ראש לרגל.</div>
+    </div>
+    <div class="ob-slide" id="ob-2" style="display:none;flex-direction:column;align-items:center;padding:20px 28px 0;text-align:center;">
+      <div style="width:210px;height:190px;border-radius:26px;background:linear-gradient(135deg,#2C1810,#4A2C1A);display:flex;align-items:center;justify-content:center;font-size:72px;margin-bottom:28px;">✨</div>
+      <div style="font-size:11px;font-weight:700;color:var(--caramel);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px;">03 / 03</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;color:var(--text);line-height:1.3;margin-bottom:10px;">ברירת המחדל שלך לאופנה</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.65;">מהרגע שראית משהו ועד שאתה לובש אותו — הכל קורה ב-SnapStyle.</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:6px;justify-content:center;padding:22px 0 16px;">
+    <div class="ob-dot active" id="odot-0"></div>
+    <div class="ob-dot" id="odot-1"></div>
+    <div class="ob-dot" id="odot-2"></div>
+  </div>
+  <div style="padding:0 24px 48px;">
+    <button id="ob-main-btn" onclick="obNext()" style="width:100%;padding:16px;background:var(--dark);border:none;border-radius:16px;font-size:15px;font-weight:700;color:#FFFBF5;cursor:pointer;font-family:inherit;margin-bottom:10px;">המשך</button>
+    <div id="ob-google-btn" style="display:none;">
+      <div id="google-signin-btn" style="width:100%;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async></script>
+
+<!-- HOME -->
+<div class="screen active" id="s-home">
+  <div class="scr-body">
+    <div class="home-top">
+      <div>
+        <div class="home-greeting" id="home-greeting">שלום</div>
+        <div class="home-title-row">Snap<span style="color:var(--caramel)">Style</span></div>
+      </div>
+      <div class="home-avatar" id="home-avatar" onclick="openProfileSheet()" style="cursor:pointer;">👤</div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero-card" onclick="navTo('s-snap-upload','nav-snap')">
+      <div class="hero-season">✦ Spring Collection 2025</div>
+      <div class="hero-headline">גלה כל בגד <span>בשנייה</span></div>
+      <div class="hero-sub">צלם, זהה, קנה. אפליקציית האופנה החכמה שלך.</div>
+      <button class="hero-cta" onclick="event.stopPropagation();navTo('s-snap-upload','nav-snap')">התחל Snap ›</button>
+    </div>
+
+    <!-- Feature grid — 4 cards -->
+    <div class="feature-grid">
+      <div class="fcard" onclick="navTo('s-snap-upload','nav-snap')">
+        <div class="fcard-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <div class="fcard-title">Outfit Snap</div>
+        <div class="fcard-sub">זהה בגד בשנייה</div>
+      </div>
+      <div class="fcard" onclick="go('s-social-upload')">
+        <div class="fcard-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+        <div class="fcard-title">Social Snap</div>
+        <div class="fcard-sub">מהאינסטגרם שלך</div>
+      </div>
+      <div class="fcard" onclick="go('s-twin-select')">
+        <div class="fcard-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <div class="fcard-title">Style Twin</div>
+        <div class="fcard-sub">שכפל את הסגנון</div>
+      </div>
+      <div class="fcard" onclick="navTo('s-wardrobe','nav-wardrobe')">
+        <div class="fcard-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H5v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h1.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg></div>
+        <div class="fcard-title">הארון שלי</div>
+        <div class="fcard-sub" id="homeWardrobeSub">0 פריטים</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="section-hdr"><span class="section-title">הסיכום שלך</span></div>
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <div class="stat-val" id="homeSnapCount">0</div>
+        <div class="stat-lbl">Snaps</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="stat-val">—</div>
+        <div class="stat-lbl">חסכת</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H5v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h1.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg></div>
+        <div class="stat-val" id="homeWardrobeCount">0</div>
+        <div class="stat-lbl">בארון</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <div class="stat-val" id="homeWishlistCount">0</div>
+        <div class="stat-lbl">שמורים</div>
+      </div>
+    </div>
+
+    <!-- Recent finds -->
+    <div id="recentFindsSection" style="display:none">
+      <div class="section-hdr"><span class="section-title">מצאת לאחרונה</span></div>
+      <div class="recent-scroll" id="recentFindsScroll"></div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+
+  <!-- Nav (4 tabs) -->
+  <div class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="navTo('s-home','nav-home')">
+      <div class="nav-icon-wrap"><svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <span class="nav-label">בית</span>
+    </button>
+    <button class="nav-item" id="nav-snap" onclick="navTo('s-snap-upload','nav-snap')">
+      <div class="nav-icon-wrap"><svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+      <span class="nav-label">סרוק</span>
+    </button>
+    <button class="nav-item" id="nav-wardrobe" onclick="navTo('s-wardrobe','nav-wardrobe')">
+      <div class="nav-icon-wrap"><svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H5v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h1.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg></div>
+      <span class="nav-label">ארון</span>
+    </button>
+    <button class="nav-item" id="nav-wishlist" onclick="navTo('s-wishlist','nav-wishlist')">
+      <div class="nav-icon-wrap"><svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+      <span class="nav-label">שמורים</span>
+    </button>
+  </div>
+</div>
+
+<!-- PROFILE SHEET -->
+<div class="profile-overlay" id="profileOverlay" onclick="closeProfile(event)">
+  <div class="profile-sheet" id="profileSheet">
+    <div class="ps-drag"></div>
+    <div class="ps-head">
+      <div class="ps-avatar" id="psAvatar">👤</div>
+      <div id="psNameRow"><div class="ps-not-logged">לא מחובר</div></div>
+    </div>
+    <div class="ps-body" id="psBody">
+      <div id="psGoogleWrap" style="padding-bottom:8px;">
+        <div id="google-signin-btn-profile" style="width:100%;min-height:44px;"></div>
+      </div>
+      <div id="psSignedIn" style="display:none;">
+        <div class="ps-row" onclick="handleSignOut()">
+          <div class="ps-row-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
+          <div class="ps-row-text"><div class="ps-row-lbl" style="color:#f87171;">התנתק</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SNAP: UPLOAD -->
+<div class="screen" id="s-snap-upload">
+  <div class="hdr-simple"><button class="back" onclick="goHome()">←</button><div><h1>Outfit Snap</h1><p>צלם בגד וזהה מיד</p></div></div>
+  <div class="scr-body" style="display:flex;flex-direction:column;padding:20px 0 0;">
+    <input type="file" id="snapCameraFile" accept="image/*" capture="environment" style="display:none"/>
+    <input type="file" id="snapGalleryFile" accept="image/*" style="display:none"/>
+    <div class="upload-area" onclick="document.getElementById('snapGalleryFile').click()">
+      <div class="upl-icon"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+      <div class="upl-title">גרור או לחץ להעלאה</div>
+      <div class="upl-sub">JPG, PNG · מקסימום 20MB</div>
+    </div>
+    <button class="action-btn primary" onclick="document.getElementById('snapCameraFile').click()">📷 צלם עכשיו</button>
+    <button class="action-btn secondary" onclick="document.getElementById('snapGalleryFile').click()">🖼️ בחר מהגלריה</button>
+  </div>
+</div>
+
+
+<!-- SNAP: NAME GARMENT -->
+<div class="screen" id="s-snap-name">
+  <div class="hdr-simple"><button class="back" onclick="go('s-snap-upload')">←</button><div><h1>מה הבגד?</h1><p>תן שם לפריט לפני ההוספה</p></div></div>
+  <div class="scr-body" style="display:flex;flex-direction:column;padding:20px;">
+    <div style="border-radius:20px;overflow:hidden;background:var(--card);height:260px;position:relative;margin-bottom:20px;border:1.5px solid var(--border);">
+      <img id="snapNameImg" style="width:100%;height:100%;object-fit:contain;position:absolute;inset:0;"/>
+    </div>
+    <div style="background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;">
+      <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px;font-weight:600;">שם הפריט</label>
+      <input id="snapNameInput" type="text" placeholder="למשל: חולצה לבנה, ג׳ינס כחול..." style="width:100%;padding:12px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;box-sizing:border-box;outline:none;background:var(--bg);color:var(--text);font-family:inherit;"/>
+    </div>
+    <div style="background:var(--card);border-radius:16px;padding:16px;margin-bottom:20px;">
+      <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:10px;font-weight:600;">קטגוריה</label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;" id="snapNameCats">
+        <button onclick="selectSnapCat(this,'tops')" class="cat-btn active">עליוניות</button>
+        <button onclick="selectSnapCat(this,'bottoms')" class="cat-btn">תחתוניות</button>
+        <button onclick="selectSnapCat(this,'dresses')" class="cat-btn">שמלות</button>
+        <button onclick="selectSnapCat(this,'outerwear')" class="cat-btn">מעילים</button>
+        <button onclick="selectSnapCat(this,'shoes')" class="cat-btn">נעליים</button>
+        <button onclick="selectSnapCat(this,'accessories')" class="cat-btn">אביזרים</button>
+      </div>
+    </div>
+    <button class="action-btn primary" onclick="confirmSnapName()">הוסף לארון ✓</button>
+  </div>
+</div>
+
+<!-- SNAP: SCAN (dark) -->
+<div class="screen" id="s-snap-scan" style="position:relative">
+  <div class="err-overlay" id="snapErrOverlay">
+    <div class="err-icon">😕</div>
+    <div class="err-title">הניתוח נכשל</div>
+    <div class="err-msg" id="snapErrMsg">לא הצלחנו לנתח את התמונה.</div>
+    <button class="err-retry" id="snapErrRetry">🔄 נסה שוב</button>
+  </div>
+  <div class="scan-hdr">
+    <div class="scan-hdr-title">זיהוי בגד</div>
+    <button class="scan-hdr-x" onclick="go('s-snap-upload')">×</button>
+  </div>
+  <div class="scan-frame">
+    <img id="snapScanImg"/>
+    <div class="scan-frame-ph" id="snapScanPh">👗</div>
+    <div class="scan-line"></div>
+    <div class="scan-corners"><div class="sc tl"></div><div class="sc tr"></div><div class="sc bl"></div><div class="sc br"></div></div>
+  </div>
+  <div class="scan-instr">מקם את הבגד בתוך המסגרת</div>
+  <!-- hidden step elements — JS still references them -->
+  <span id="ss1" style="display:none"></span><span id="ss1i" style="display:none"></span>
+  <span id="ss2" style="display:none"></span><span id="ss2i" style="display:none"></span>
+  <span id="ss3" style="display:none"></span><span id="ss3i" style="display:none"></span>
+</div>
+
+<!-- SNAP: DETECTED -->
+<div class="screen" id="s-snap-detected">
+  <div class="hdr-simple"><button class="back" onclick="go('s-snap-upload')">←</button><div><h1>פריטים שזוהו</h1><p id="snapItemCount">3 פריטים</p></div><div class="hdr-right"><button class="hdr-btn" onclick="addAllToWardrobe()">+ הכל</button></div></div>
+  <div class="scr-body">
+    <div class="thumb-wrap"><img id="snapThumbImg"/><div class="thumb-ph" id="snapThumbPh">👗</div><div class="thumb-grad"></div><div class="thumb-lbl">האאוטפיט שלך</div></div>
+    <div class="sec-lbl" style="margin-top:4px">לחץ על פריט לחיפוש מוצרים</div>
+    <div id="snapItemList"></div>
+    <button class="action-btn secondary" style="margin-top:8px" onclick="go('s-snap-upload')">📷 צלם מחדש</button>
+  </div>
+</div>
+
+<!-- SNAP: PRODUCTS -->
+<div class="screen" id="s-snap-products">
+  <div class="hdr-simple"><button class="back" onclick="go('s-snap-detected')">←</button><div class="prod-hdr-info"><h1>מוצרים דומים</h1><p id="snapProdSub">חולצה · כחול</p></div></div>
+  <div class="scr-body">
+    <div class="top-grid" id="snapTopGrid"></div>
+    <div class="more-lbl">עוד מוצרים</div>
+    <div class="grid3" id="snapMoreGrid"></div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- SOCIAL: UPLOAD -->
+<div class="screen" id="s-social-upload">
+  <div class="hdr-simple"><button class="back" onclick="goHome()">←</button><div><h1>Social Snap</h1><p>זהה בגדים מתמונת רשת</p></div></div>
+  <div class="scr-body" style="padding-top:16px;">
+    <input type="file" id="socialFile" accept="image/*" onchange="handleSocial(event)" style="display:none"/>
+    <div class="upload-area" style="margin-bottom:4px;" onclick="document.getElementById('socialFile').click()">
+      <div class="upl-icon"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+      <div class="upl-title">העלה תמונה מהרשת</div>
+      <div class="upl-sub">אינסטגרם, טיקטוק, Pinterest — כל תמונת לוק</div>
+    </div>
+    <div class="src-grid">
+      <div class="src-card" onclick="document.getElementById('socialFile').click()">
+        <div class="src-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+        <div class="src-name">הגלריה שלי</div><div class="src-sub">תמונות שמורות</div>
+      </div>
+      <div class="src-card" onclick="showSocialLinkInput('instagram')">
+        <div class="src-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+        <div class="src-name">Instagram</div><div class="src-sub">הדבק לינק לפוסט</div>
+      </div>
+      <div class="src-card" onclick="showSocialLinkInput('tiktok')">
+        <div class="src-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></div>
+        <div class="src-name">TikTok</div><div class="src-sub">הדבק לינק לסרטון</div>
+      </div>
+      <div class="src-card" onclick="document.getElementById('socialFile').click()">
+        <div class="src-ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div class="src-name">העלאה</div><div class="src-sub">מהמחשב</div>
+      </div>
+    </div>
+    <div id="socialLinkBox" style="display:none;margin:0 16px 16px;background:var(--card);border-radius:16px;padding:16px;border:1.5px solid var(--border);">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px" id="socialLinkTitle">הדבק לינק</div>
+      <input id="socialLinkInput" type="url" placeholder="https://..." style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);font-size:13px;box-sizing:border-box;outline:none;background:var(--bg);color:var(--text);"/>
+      <button onclick="handleSocialLink()" style="margin-top:10px;width:100%;padding:11px;background:var(--caramel);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">זהה בגדים</button>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL: SCAN (dark) -->
+<div class="screen" id="s-social-scan">
+  <div class="hdr-simple"><button class="back" onclick="go('s-social-upload')">←</button><div><h1>סורק</h1><p>AI מאתר בגדים...</p></div></div>
+  <div class="scan-wrap">
+    <div class="scan-img-box">
+      <img id="socialScanImg"/><div class="scan-ph" id="socialScanPh">👗</div>
+      <div class="scan-line"></div>
+      <div class="scan-corners"><div class="sc tl"></div><div class="sc tr"></div><div class="sc bl"></div><div class="sc br"></div></div>
+    </div>
+    <div class="step-list">
+      <div class="step" id="sc1"><span>🔎</span><span>זיהוי פריטי לבוש</span><span id="sc1i" style="margin-right:auto"></span></div>
+      <div class="step" id="sc2"><span>🎨</span><span>ניתוח צבעים</span><span id="sc2i" style="margin-right:auto"></span></div>
+      <div class="step" id="sc3"><span>🛍️</span><span>חיפוש מוצרים</span><span id="sc3i" style="margin-right:auto"></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SOCIAL: RESULTS -->
+<div class="screen" id="s-social-results">
+  <div class="hdr-simple"><button class="back" onclick="go('s-social-upload')">←</button><div><h1>זוהו 3 פריטים</h1><p>לחץ על נקודה לפרטים</p></div></div>
+  <div class="scr-body">
+    <div class="tag-wrap" id="socialTagWrap">
+      <img id="socialTagImg"/><div class="tag-ph" id="socialTagPh">👗</div>
+    </div>
+    <div class="chips-scroll" id="socialChips"></div>
+    <div class="shop-sec" id="socialShop"></div>
+  </div>
+</div>
+
+<!-- TWIN: SELECT -->
+<div class="screen" id="s-twin-select">
+  <div class="hdr-simple"><button class="back" onclick="goHome()">←</button><div><h1>Style Twin</h1><p>בחר סגנון לשכפל</p></div></div>
+  <div class="scr-body" style="padding-top:16px;">
+    <input type="file" id="twinFile" accept="image/*" onchange="handleTwin(event)" style="display:none"/>
+    <div class="upload-area" style="margin-bottom:4px;" onclick="document.getElementById('twinFile').click()">
+      <div class="upl-icon"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+      <div class="upl-title">העלה תמונה</div>
+      <div class="upl-sub">של אדם עם סגנון שאהבת</div>
+    </div>
+    <div style="padding:4px 20px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">או בחר סגנון</div>
+    <div class="style-grid">
+      <div class="sty-ex" onclick="startTwin('Streetwear')"><div class="sty-ico" style="background:#1a1a2e"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12h8M12 8v8"/></svg></div><div class="sty-name">Streetwear</div></div>
+      <div class="sty-ex" onclick="startTwin('Business Casual')"><div class="sty-ico" style="background:#1e3a5f"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H5v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h1.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg></div><div class="sty-name">Business Casual</div></div>
+      <div class="sty-ex" onclick="startTwin('Boho Chic')"><div class="sty-ico" style="background:#5c3317"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="sty-name">Boho Chic</div></div>
+      <div class="sty-ex" onclick="startTwin('Old Money')"><div class="sty-ico" style="background:#2d4a3e"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="sty-name">Old Money</div></div>
+      <div class="sty-ex" onclick="startTwin('Techwear')"><div class="sty-ico" style="background:#111"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="sty-name">Techwear</div></div>
+      <div class="sty-ex" onclick="startTwin('Y2K')"><div class="sty-ico" style="background:#7c3aed"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="sty-name">Y2K</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TWIN: ANALYZING -->
+<div class="screen" id="s-twin-analyze">
+  <div class="hdr-simple"><button class="back" onclick="go('s-twin-select')">←</button><div><h1>מנתח סגנון</h1><p>AI מזהה את ה-DNA...</p></div></div>
+  <div class="anl-wrap">
+    <div class="anl-img-rel">
+      <div class="anl-img-box"><img id="twinAnlImg"/><div class="anl-ph" id="twinAnlPh"></div></div>
+      <div class="anl-ring"></div>
+    </div>
+    <div class="anl-lbl" id="twinAnlLbl">מנתח...</div>
+    <div class="anl-sub" id="twinAnlSub">AI סורק צבעים, חיתוכים, ואלמנטים</div>
+    <div class="anl-attrs" id="twinAttrs"></div>
+  </div>
+</div>
+
+<!-- TWIN: RESULTS -->
+<div class="screen" id="s-twin-results">
+  <div class="hdr-simple"><button class="back" onclick="go('s-twin-select')">←</button><div><h1 id="twinResultTitle">Style Twin</h1><p>בחר תקציב</p></div></div>
+  <div class="scr-body">
+    <div class="id-card">
+      <div class="id-img"><img id="twinIdImg"/><div class="id-ph" id="twinIdPh"></div></div>
+      <div class="id-meta">
+        <div class="id-top">זוהה הסגנון ✨</div>
+        <div class="id-sty" id="twinIdStyle">Streetwear</div>
+        <div class="id-tags" id="twinIdTags"></div>
+      </div>
+    </div>
+    <div class="budget-tabs">
+      <div class="btab b ab" id="bt-b" onclick="selBudget('b')"><span class="bico">💚</span>זול</div>
+      <div class="btab m" id="bt-m" onclick="selBudget('m')"><span class="bico">💙</span>בינוני</div>
+      <div class="btab p" id="bt-p" onclick="selBudget('p')"><span class="bico">💜</span>פרמיום</div>
+    </div>
+    <div class="look-panel" id="twinLookPanel"></div>
+  </div>
+</div>
+
+<!-- WARDROBE -->
+<div class="screen" id="s-wardrobe">
+  <div class="hdr-simple">
+    <div style="flex:1"><h1>הארון שלי</h1><p id="wardrobeHeader">0 פריטים</p></div>
+    <div class="hdr-right"><button class="hdr-btn" onclick="navTo('s-snap-upload','nav-snap')">+</button></div>
+  </div>
+  <div class="scr-body" style="padding-top:16px;">
+    <div class="wardrobe-hero">
+      <div class="wardrobe-stats">
+        <div class="w-stat-num" id="wardrobeHeroNum">0</div>
+        <div class="w-stat-lbl">פריטים בארון</div>
+      </div>
+      <div class="w-cats">
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#6366f1"></div><span class="w-cat-lbl">חולצות</span><span class="w-cat-num" id="catTops">0</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#ec4899"></div><span class="w-cat-lbl">מכנסיים</span><span class="w-cat-num" id="catBottoms">0</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#f59e0b"></div><span class="w-cat-lbl">נעליים</span><span class="w-cat-num" id="catFootwear">0</span></div>
+        <div class="w-cat-row"><div class="w-cat-dot" style="background:#10b981"></div><span class="w-cat-lbl">אביזרים</span><span class="w-cat-num" id="catAccessories">0</span></div>
+      </div>
+    </div>
+    <div class="filter-tabs">
+      <div class="ftab active" onclick="setFilter(this,'all')">הכל</div>
+      <div class="ftab" onclick="setFilter(this,'tops')">חולצות</div>
+      <div class="ftab" onclick="setFilter(this,'bottoms')">מכנסיים</div>
+      <div class="ftab" onclick="setFilter(this,'footwear')">נעליים</div>
+      <div class="ftab" onclick="setFilter(this,'accessories')">אביזרים</div>
+    </div>
+    <div class="section-hdr"><span class="section-title">הפריטים שלי</span></div>
+    <div class="wardrobe-grid" id="wardrobeGrid"></div>
+    <div class="outfit-section">
+      <div class="section-hdr"><span class="section-title">לוק מוצע היום</span></div>
+      <div class="outfit-card">
+        <div class="outfit-title">Business Casual · ספורטיבי</div>
+        <div class="outfit-sub">משולב מהפריטים שלך · תואם 95%</div>
+        <div class="outfit-pieces">
+          <div class="outfit-piece"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H5v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h1.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg></div>
+          <div class="outfit-piece"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg></div>
+          <div class="outfit-piece"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20M2 12c0 4 4 7 10 7s10-3 10-7"/><path d="M6 12V7a6 6 0 0 1 12 0v5"/></svg></div>
+          <div class="outfit-piece"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="10"/><line x1="12" y1="12" x2="12" y2="8"/><line x1="12" y1="12" x2="15" y2="12"/></svg></div>
+        </div>
+        <button class="outfit-action" onclick="navTo('s-snap-upload','nav-snap')">חפש פריטים חסרים</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WISHLIST (שמורים) -->
+<div class="screen" id="s-wishlist">
+  <div class="hdr-simple">
+    <div style="flex:1"><h1>שמורים</h1><p id="wishlistHeader">0 פריטים שמורים</p></div>
+  </div>
+  <div class="scr-body" style="padding-top:16px;">
+    <div class="wish-banner">
+      <div class="wish-banner-h">❤️ הרשימה שלי</div>
+      <div class="wish-banner-sub">אנחנו עוקבים אחרי המחירים ונודיע כשיירד</div>
+      <div class="wish-banner-stat" id="wishlistBannerTotal">₪0</div>
+      <div class="wish-banner-stat-lbl">שווי כולל ברשימה</div>
+    </div>
+    <div class="price-track-banner">
+      <div class="ptb-icon">🔔</div>
+      <div class="ptb-text">
+        <div class="ptb-h">מעקב מחיר פעיל</div>
+        <div class="ptb-sub">תקבל התראה כשמחיר יירד מ-10%</div>
+      </div>
+    </div>
+    <div class="wish-list" id="wishList"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════ GOOGLE AUTH ══════════════════
+const GOOGLE_CLIENT_ID = '187048911336-u7sget9mjlsdqpang5oraafmintt1ses.apps.googleusercontent.com';
+let googleInitialized = false;
+
+function initGoogleSignIn() {
+  if (typeof google === 'undefined' || !GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') return;
+  if (googleInitialized) return;
+  googleInitialized = true;
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleLogin,
+    ux_mode: 'popup',
+  });
+  const btnEl = document.getElementById('google-signin-btn');
+  if (btnEl) {
+    google.accounts.id.renderButton(btnEl, {
+      theme: 'outline', size: 'large', text: 'continue_with',
+      locale: 'he', width: 342, shape: 'pill',
+    });
+  }
+  const btnProfile = document.getElementById('google-signin-btn-profile');
+  if (btnProfile) {
+    google.accounts.id.renderButton(btnProfile, {
+      theme: 'outline', size: 'large', text: 'signin_with',
+      locale: 'he', width: 342, shape: 'pill',
+    });
+  }
+}
+
+function handleGoogleLogin(response) {
+  try {
+    const base64 = response.credential.split('.')[1];
+    const payload = JSON.parse(decodeURIComponent(atob(base64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+    const user = { name: payload.name, email: payload.email, picture: payload.picture };
+    localStorage.setItem('snapstyle_user', JSON.stringify(user));
+    applyUserToUI(user);
+    const onboardingActive = document.getElementById('s-onboarding').classList.contains('active');
+    if (onboardingActive) {
+      finishOnboarding();
+    } else {
+      updateProfileSheet(user);
+      closeProfileSheet();
+      showToast('שלום, ' + (user.name ? user.name.split(' ')[0] : '') + ' 👋');
+    }
+  } catch(e) {
+    const onboardingActive = document.getElementById('s-onboarding').classList.contains('active');
+    if (onboardingActive) finishOnboarding(); else closeProfileSheet();
+  }
+}
+
+function openProfileSheet() {
+  const overlay = document.getElementById('profileOverlay');
+  overlay.classList.add('show');
+  if (!googleInitialized) setTimeout(initGoogleSignIn, 300);
+  const savedUser = localStorage.getItem('snapstyle_user');
+  updateProfileSheet(savedUser ? JSON.parse(savedUser) : null);
+}
+
+function updateProfileSheet(user) {
+  const psAvatar = document.getElementById('psAvatar');
+  const psNameRow = document.getElementById('psNameRow');
+  const psGoogleWrap = document.getElementById('psGoogleWrap');
+  const psSignedIn = document.getElementById('psSignedIn');
+  if (user && user.email) {
+    if (user.picture) {
+      psAvatar.innerHTML = '<img src="'+user.picture+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    } else {
+      psAvatar.textContent = (user.name || user.email)[0].toUpperCase();
+    }
+    psNameRow.innerHTML = '<div class="ps-name">'+(user.name||'')+'</div><div class="ps-email">'+user.email+'</div>';
+    psGoogleWrap.style.display = 'none';
+    psSignedIn.style.display = 'block';
+  } else {
+    psAvatar.textContent = '👤';
+    psNameRow.innerHTML = '<div class="ps-not-logged">לא מחובר</div>';
+    psGoogleWrap.style.display = 'block';
+    psSignedIn.style.display = 'none';
+  }
+}
+
+function closeProfile(e) {
+  if (e.target === document.getElementById('profileOverlay')) closeProfileSheet();
+}
+function closeProfileSheet() {
+  document.getElementById('profileOverlay').classList.remove('show');
+}
+
+function handleSignOut() {
+  localStorage.removeItem('snapstyle_user');
+  const greeting = document.getElementById('home-greeting');
+  const avatar = document.getElementById('home-avatar');
+  if (greeting) greeting.textContent = 'שלום';
+  if (avatar) { avatar.innerHTML = ''; avatar.textContent = '👤'; }
+  updateProfileSheet(null);
+  closeProfileSheet();
+  showToast('התנתקת בהצלחה');
+}
+
+function isGarbled(str) {
+  if (!str) return true;
+  return /[×�]/.test(str) || str.split('').some(c => c.charCodeAt(0) > 127 && c.charCodeAt(0) < 160);
+}
+
+function applyUserToUI(user) {
+  if (!user) return;
+  const greeting = document.getElementById('home-greeting');
+  const avatar = document.getElementById('home-avatar');
+  let displayName = user.name || '';
+  if (isGarbled(displayName) && user.email) {
+    displayName = user.email.split('@')[0];
+    user.name = displayName;
+    localStorage.setItem('snapstyle_user', JSON.stringify(user));
+  }
+  const firstName = displayName ? displayName.split(' ')[0] : '';
+  if (greeting) greeting.textContent = firstName ? 'שלום, ' + firstName : 'שלום';
+  if (avatar) {
+    if (user.picture) {
+      avatar.innerHTML = '<img src="' + user.picture + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+    } else {
+      avatar.textContent = firstName ? firstName[0].toUpperCase() : '?';
+    }
+  }
+  if (document.getElementById('profileOverlay').classList.contains('show')) updateProfileSheet(user);
+}
+
+// ══════════════════ ONBOARDING ══════════════════
+let obCurrent = 0;
+function obGoTo(i) {
+  document.getElementById('ob-' + obCurrent).style.display = 'none';
+  document.getElementById('odot-' + obCurrent).classList.remove('active');
+  obCurrent = i;
+  document.getElementById('ob-' + obCurrent).style.display = 'flex';
+  document.getElementById('odot-' + obCurrent).classList.add('active');
+  const btn = document.getElementById('ob-main-btn');
+  const googleBtn = document.getElementById('ob-google-btn');
+  if (obCurrent === 2) {
+    btn.style.display = 'none';
+    googleBtn.style.display = 'block';
+  } else {
+    btn.style.display = 'block';
+    googleBtn.style.display = 'none';
+  }
+}
+function obNext() {
+  if (obCurrent < 2) obGoTo(obCurrent + 1);
+}
+function finishOnboarding() {
+  localStorage.setItem('snapstyle_onboarding_done', '1');
+  document.getElementById('s-onboarding').classList.remove('active');
+  document.getElementById('s-home').classList.add('active');
+  const savedUser = localStorage.getItem('snapstyle_user');
+  if (savedUser) try { applyUserToUI(JSON.parse(savedUser)); } catch(e){}
+}
+
+// ══════════════════ NAV (4 tabs) ══════════════════
+const SCREENS=['s-home','s-snap-upload','s-snap-name','s-snap-scan','s-snap-detected','s-snap-products','s-social-upload','s-social-scan','s-social-results','s-twin-select','s-twin-analyze','s-twin-results','s-wardrobe','s-wishlist'];
+const NAV_IDS=['nav-home','nav-snap','nav-wardrobe','nav-wishlist'];
+const NAV_MAP={'nav-home':'s-home','nav-snap':'s-snap-upload','nav-wardrobe':'s-wardrobe','nav-wishlist':'s-wishlist'};
+
+function go(id){
+  SCREENS.forEach(s=>{const el=document.getElementById(s);if(el)el.classList.remove('active');});
+  const t=document.getElementById(id);if(t)t.classList.add('active');
+  syncNav();
+}
+function goHome(){navTo('s-home','nav-home');}
+function navTo(screenId,navId){
+  go(screenId);
+  NAV_IDS.forEach(n=>{const el=document.getElementById(n);if(el)el.classList.remove('active');});
+  const active=document.getElementById(navId);if(active)active.classList.add('active');
+}
+function syncNav(){}
+
+// ══════════════════ TOAST ══════════════════
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// ══════════════════ SCAN HELPER ══════════════════
+function runScan(steps,inds,cb){
+  steps.forEach((s,i)=>{document.getElementById(s).className='step';document.getElementById(inds[i]).textContent='';});
+  function act(i){
+    if(i>0){document.getElementById(steps[i-1]).className='step done';document.getElementById(inds[i-1]).textContent='✅';}
+    if(i<steps.length){document.getElementById(steps[i]).className='step active';document.getElementById(inds[i]).innerHTML='<div class="spinner"></div>';}
+  }
+  act(0);
+  setTimeout(()=>act(1),800);
+  setTimeout(()=>act(2),1600);
+  setTimeout(()=>{document.getElementById(steps[2]).className='step done';document.getElementById(inds[2]).textContent='✅';},2400);
+  setTimeout(cb,2900);
+}
+function setImg(imgId,phId,url,emoji){
+  const img=document.getElementById(imgId),ph=document.getElementById(phId);
+  if(url){img.src=url;img.classList.add('show');ph.style.display='none';}
+  else{img.classList.remove('show');ph.style.display='flex';if(emoji)ph.textContent=emoji;}
+}
+
+// ══════════════════ SNAP ══════════════════
+let snapItems=[
+  {id:1,type:'חולצת טי',cat:'tops',color:'Navy Blue',hex:'#1e3a8a',brand:'Nike',style:'Casual',gender:'גברים',conf:.95},
+  {id:2,type:"ג'ינס",cat:'bottoms',color:'Dark Indigo',hex:'#312e81',brand:"Levi's",style:'Classic',gender:'גברים',conf:.91},
+  {id:3,type:'סניקרס',cat:'footwear',color:'White',hex:'#f9fafb',brand:'Adidas',style:'Sport',gender:'יוניסקס',conf:.88},
+];
+const catIcons={tops:'👕',bottoms:'👖',footwear:'👟',accessories:'⌚',default:'👔'};
+
+function shadeHex(hex, pct) {
+  try {
+    const num = parseInt(hex.replace('#',''), 16);
+    const r = Math.min(255, Math.max(0, (num >> 16) + pct));
+    const g = Math.min(255, Math.max(0, ((num >> 8) & 0xff) + pct));
+    const b = Math.min(255, Math.max(0, (num & 0xff) + pct));
+    return '#' + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+  } catch(e) { return '#7a5530'; }
+}
+
+const STORES=[
+  {name:'ASOS',emoji:'🛍️',bg:'#000',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www.asos.com/search/?q='+encodeURIComponent(q);}},
+  {name:'H&M',emoji:'🏪',bg:'#e50010',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www2.hm.com/en_gb/search-results.html?q='+encodeURIComponent(q);}},
+  {name:'Zara',emoji:'✨',bg:'#1a1a1a',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www.zara.com/il/en/search?searchTerm='+encodeURIComponent(q);}},
+  {name:'Nike',emoji:'✔️',bg:'#111',fg:'#fff',cats:['tops','footwear','bottoms'],url:function(q){return'https://www.nike.com/il/search?q='+encodeURIComponent(q);}},
+  {name:'Adidas',emoji:'🏃',bg:'#000',fg:'#fff',cats:['tops','footwear','bottoms'],url:function(q){return'https://www.adidas.co.il/search?q='+encodeURIComponent(q);}},
+  {name:'Fox',emoji:'🦊',bg:'#e85d04',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www.fox.co.il/search/?q='+encodeURIComponent(q);}},
+  {name:'Castro',emoji:'💜',bg:'#6b21a8',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://www.castro.com/catalogsearch/result/?q='+encodeURIComponent(q);}},
+  {name:'Shein',emoji:'💕',bg:'#e91e8c',fg:'#fff',cats:['tops','bottoms','footwear','accessories','dresses'],url:function(q){return'https://il.shein.com/pdsearch/'+encodeURIComponent(q)+'/';}},
+];
+
+const typeToEn={
+  'חולצת טי':'t-shirt',"ג'ינס":'jeans','סניקרס':'sneakers',
+  'מכנסיים':'pants','שמלה':'dress','חצאית':'skirt',
+  "ג'קט":'jacket',"ז'קט":'jacket','מעיל':'coat','חולצה':'shirt',
+  'נעלי ספורט':'sport shoes','מגפיים':'boots','סנדלים':'sandals',
+  'כובע':'hat','תיק':'bag','אביזר':'accessory',
+  'חולצת אוברסייז':'oversized shirt','מכנסי קארגו':'cargo pants',
+  'נעלי פלטפורמה':'platform shoes','ברמודה':'shorts',
+  'מכנסי טרנינג':'sweatpants','גופיה':'tank top',
+};
+function buildSearchQuery(item){
+  var type=item.type?(typeToEn[item.type]||item.type):'clothing';
+  var parts=[type];
+  if(item.color)parts.push(item.color);
+  if(item.brand&&item.brand!=='unknown'&&item.brand!=='לא ידוע')parts.push(item.brand);
+  return parts.join(' ');
+}
+function getStoresForCategory(cat){
+  return STORES.filter(function(s){return s.cats.indexOf(cat||'tops')>=0;});
+}
+
+let snapImgUrl=null;
+
+window.addEventListener('load',function(){
+  var cam=document.getElementById('snapCameraFile');
+  var gal=document.getElementById('snapGalleryFile');
+  if(cam)cam.addEventListener('change',handleSnap);
+  if(gal)gal.addEventListener('change',handleSnap);
+  loadFromStorage();
+  renderWardrobe();
+  renderWishlist();
+  renderRecentFinds();
+  updateStats();
+  const onboardingDone = localStorage.getItem('snapstyle_onboarding_done');
+  const savedUser = localStorage.getItem('snapstyle_user');
+  if (!onboardingDone) {
+    document.getElementById('s-home').classList.remove('active');
+    document.getElementById('s-onboarding').classList.add('active');
+    setTimeout(initGoogleSignIn, 1000);
+  } else {
+    if (savedUser) try { applyUserToUI(JSON.parse(savedUser)); } catch(e){}
+    setTimeout(initGoogleSignIn, 1500);
+  }
+});
+
+var snapNameCat='tops';
+var snapGalleryBase64=null,snapGalleryMime=null;
+
+function handleSnap(e){
+  var f=e.target.files&&e.target.files[0];if(!f)return;
+  var isCamera=(e.target.id==='snapCameraFile');
+  e.target.value='';
+  snapImgUrl=URL.createObjectURL(f);
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var base64=ev.target.result.split(',')[1];
+    var mime=f.type||'image/jpeg';
+    if(isCamera){
+      startSnapScan(base64,mime);
+    } else {
+      snapGalleryBase64=base64;snapGalleryMime=mime;
+      showSnapNameScreen();
+    }
+  };
+  reader.onerror=function(){startSnapScan(null,null);};
+  reader.readAsDataURL(f);
+}
+function showSnapNameScreen(){
+  var img=document.getElementById('snapNameImg');
+  if(img) img.src=snapImgUrl||'';
+  var inp=document.getElementById('snapNameInput');
+  if(inp) inp.value='';
+  snapNameCat='tops';
+  document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('active');});
+  var first=document.querySelector('.cat-btn');
+  if(first) first.classList.add('active');
+  go('s-snap-name');
+}
+function selectSnapCat(btn,cat){
+  snapNameCat=cat;
+  document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+}
+function confirmSnapName(){
+  var name=document.getElementById('snapNameInput').value.trim();
+  if(!name){showToast('הכנס שם לפריט');return;}
+  var entry={id:Date.now(),name:name,meta:'',cat:snapNameCat,image:snapImgUrl||null};
+  wardrobeItems.push(entry);
+  localStorage.setItem('styleSnap_wardrobe',JSON.stringify(wardrobeItems));
+  showToast('הפריט נוסף לארון! 👗');
+  renderWardrobe();
+  setNav('nav-wardrobe');
+  go('s-wardrobe');
+}
+function runSnapMock(){snapImgUrl=null;startSnapScan(null,null);}
+function showSnapErr(msg,retryFn){
+  const overlay=document.getElementById('snapErrOverlay');
+  const msgEl=document.getElementById('snapErrMsg');
+  const retryBtn=document.getElementById('snapErrRetry');
+  if(msgEl) msgEl.textContent=msg;
+  if(retryBtn) retryBtn.onclick=function(){hideSnapErr();if(retryFn)retryFn();};
+  if(overlay) overlay.classList.add('show');
+}
+function hideSnapErr(){
+  const overlay=document.getElementById('snapErrOverlay');
+  if(overlay) overlay.classList.remove('show');
+}
+
+// ══════════════════ SCAN LIMIT ══════════════════
+const OWNER_EMAIL = 'shay1970@gmail.com';
+const DAILY_LIMIT = 5;
+
+function checkScanLimit() {
+  const savedUser = localStorage.getItem('snapstyle_user');
+  if (savedUser) {
+    try {
+      const user = JSON.parse(savedUser);
+      if (user.email === OWNER_EMAIL) return true;
+    } catch(e) {}
+  }
+  const today = new Date().toISOString().slice(0,10);
+  const stored = JSON.parse(localStorage.getItem('snapstyle_scan_limit') || '{}');
+  if (stored.date !== today) {
+    localStorage.setItem('snapstyle_scan_limit', JSON.stringify({date:today, count:0}));
+    return true;
+  }
+  if (stored.count >= DAILY_LIMIT) { showScanLimitMsg(); return false; }
+  return true;
+}
+function incrementScanCount() {
+  const savedUser = localStorage.getItem('snapstyle_user');
+  if (savedUser) {
+    try { const user=JSON.parse(savedUser); if(user.email===OWNER_EMAIL)return; } catch(e) {}
+  }
+  const today = new Date().toISOString().slice(0,10);
+  const stored = JSON.parse(localStorage.getItem('snapstyle_scan_limit') || '{}');
+  const count = (stored.date === today ? stored.count : 0) + 1;
+  localStorage.setItem('snapstyle_scan_limit', JSON.stringify({date:today, count}));
+}
+function showScanLimitMsg() {
+  showToast('הגעת למגבלת 5 סריקות היום. חזור מחר 🌅');
+  setTimeout(() => go('s-snap-upload'), 1500);
+}
+
+function startSnapScan(base64,mimeType){
+  if (!checkScanLimit()) return;
+  incrementScanCount();
+  go('s-snap-scan');
+  hideSnapErr();
+  setImg('snapScanImg','snapScanPh',snapImgUrl,'👗');
+  var animDone=false,apiDone=false,apiItems=null;
+  var lastBase64=base64,lastMime=mimeType;
+  function tryFinish(){
+    if(!animDone||!apiDone)return;
+    if(apiItems&&apiItems.length>0)snapItems=apiItems.map((item,i)=>Object.assign({},item,{id:i+1}));
+    showSnapDetected();go('s-snap-detected');
+  }
+  runScan(['ss1','ss2','ss3'],['ss1i','ss2i','ss3i'],function(){animDone=true;tryFinish();});
+  if(base64){
+    fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:base64,mimeType:mimeType})})
+      .then(r=>{
+        if(!r.ok) throw new Error('שרת החזיר שגיאה ('+r.status+'). נסה שוב.');
+        return r.json();
+      })
+      .then(data=>{
+        if(!data.items||data.items.length===0) throw new Error('לא זוהו פריטי לבוש בתמונה. נסה תמונה אחרת.');
+        apiItems=data.items;
+        apiDone=true;
+        tryFinish();
+      })
+      .catch(err=>{
+        const msg=err.message||'שגיאה בחיבור לשרת.';
+        showSnapErr(msg,()=>startSnapScan(lastBase64,lastMime));
+      });
+  }else{apiDone=true;}
+}
+
+function addToWardrobe(itemId){
+  const item=snapItems.find(i=>i.id===itemId);
+  if(!item) return;
+  const exists=wardrobeItems.some(w=>w.snapId===itemId&&w.snapTime===snapScanTime);
+  if(exists){showToast('הפריט כבר בארון');return;}
+  const entry={
+    id:Date.now(),snapId:itemId,snapTime:snapScanTime,
+    name:item.type||'פריט',
+    meta:[item.color,item.brand].filter(Boolean).join(' · ')||'',
+    cat:item.cat||'tops',
+    bg:item.hex?(item.hex+'22'):'#f4ece3',
+    hex:item.hex||'#C4956A',
+    image:snapImgUrl||null,
+    emoji:catIcons[item.cat]||catIcons.default,
+  };
+  wardrobeItems.unshift(entry);
+  saveToStorage();renderWardrobe();updateStats();
+  const btn=document.getElementById('add-btn-'+itemId);
+  if(btn){btn.classList.add('added');btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';}
+  showToast(item.type+' נוסף לארון ✓');
+}
+
+function addAllToWardrobe(){
+  let added=0;
+  snapItems.forEach(item=>{
+    const exists=wardrobeItems.some(w=>w.snapId===item.id&&w.snapTime===snapScanTime);
+    if(!exists){
+      wardrobeItems.unshift({
+        id:Date.now()+Math.random(),snapId:item.id,snapTime:snapScanTime,
+        name:item.type||'פריט',
+        meta:[item.color,item.brand].filter(Boolean).join(' · ')||'',
+        cat:item.cat||'tops',
+        bg:item.hex?(item.hex+'22'):'#f4ece3',
+        hex:item.hex||'#C4956A',
+        image:snapImgUrl||null,
+        emoji:catIcons[item.cat]||catIcons.default,
+      });
+      added++;
+    }
+  });
+  if(added===0){showToast('כל הפריטים כבר בארון');return;}
+  saveToStorage();renderWardrobe();updateStats();
+  snapItems.forEach(item=>{
+    const btn=document.getElementById('add-btn-'+item.id);
+    if(btn){btn.classList.add('added');btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';}
+  });
+  showToast(added+' פריטים נוספו לארון ✓');
+}
+
+let snapScanTime=0;
+
+function showSnapDetected(){
+  snapScanTime=Date.now();
+  setImg('snapThumbImg','snapThumbPh',snapImgUrl,'👗');
+  document.getElementById('snapItemCount').textContent=snapItems.length+' פריטים';
+  const list=document.getElementById('snapItemList');list.innerHTML='';
+  snapItems.forEach(item=>{
+    const ico=catIcons[item.cat]||catIcons.default,pct=Math.round(item.conf*100);
+    const cls=pct>=85?'cg':'cy';
+    const meta=[item.color,item.brand,item.style,item.gender].filter(Boolean).join(' · ');
+    const inWardrobe=wardrobeItems.some(w=>w.snapId===item.id&&w.snapTime===snapScanTime);
+    const btnHtml=inWardrobe
+      ?`<button class="item-row-add added" id="add-btn-${item.id}" onclick="event.stopPropagation();addToWardrobe(${item.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>`
+      :`<button class="item-row-add" id="add-btn-${item.id}" onclick="event.stopPropagation();addToWardrobe(${item.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>`;
+    list.innerHTML+=`<div class="item-row" onclick="showSnapProducts(${item.id})">
+      <div class="swatch-wrap"><div class="swatch" style="background:${item.hex}"></div><span class="cat-ico">${ico}</span></div>
+      <div class="item-info"><div class="item-name-row"><span class="iname">${item.type}</span><span class="cbadge ${cls}">${pct}%</span></div><div class="imeta">${meta}</div></div>
+      <div class="shop-ico">🛍️</div>${btnHtml}
+    </div>`;
+  });
+  snapItems.forEach(item=>{
+    const entry={
+      id:Date.now()+Math.random(),
+      name:item.type||(item.brand||'פריט'),
+      color:item.color||'',
+      hex:item.hex||'#E8D5BE',
+      brand:item.brand||'',
+      ts:Date.now()
+    };
+    recentScans.unshift(entry);
+  });
+  recentScans=recentScans.slice(0,12);
+  saveToStorage();
+  renderRecentFinds();
+}
+
+function renderRecentFinds(){
+  const sec=document.getElementById('recentFindsSection');
+  const scroll=document.getElementById('recentFindsScroll');
+  if(!sec||!scroll) return;
+  if(recentScans.length===0){sec.style.display='none';return;}
+  sec.style.display='block';
+  scroll.innerHTML=recentScans.slice(0,8).map(item=>`
+    <div class="rcard">
+      <div class="rcard-img" style="background:${item.hex}20;display:flex;align-items:center;justify-content:center;">
+        <div style="width:28px;height:28px;border-radius:50%;background:${item.hex}"></div>
+      </div>
+      <div class="rcard-name">${item.name}</div>
+      <div class="rcard-price" style="color:var(--muted);font-size:9px">${[item.color,item.brand].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+    </div>`).join('');
+}
+
+function showSnapProducts(id){
+  var item=snapItems.find(function(i){return i.id===id;});
+  document.getElementById('snapProdSub').textContent=[item.type,item.color,item.brand].filter(Boolean).join(' · ');
+  go('s-snap-products');
+  renderProductsSkeleton();
+  fetchRealProducts(item);
+}
+
+function renderProductsSkeleton(){
+  var skels='';
+  for(var i=0;i<2;i++){
+    skels+='<div class="store-card"><div class="store-card-logo" style="background:#F5EDE0;animation:skelpulse 1.2s ease-in-out infinite"></div>'+
+      '<div class="store-card-info"><div style="height:14px;background:#F5EDE0;border-radius:6px;margin-bottom:8px;animation:skelpulse 1.2s ease-in-out infinite"></div>'+
+      '<div style="height:11px;background:#F5EDE0;border-radius:6px;width:60%;animation:skelpulse 1.2s ease-in-out infinite"></div></div></div>';
+  }
+  document.getElementById('snapTopGrid').innerHTML=skels;
+  var miniSkels='';
+  for(var j=0;j<4;j++){
+    miniSkels+='<div class="pmini"><div class="pmini-img" style="background:#F5EDE0;animation:skelpulse 1.2s ease-in-out infinite"></div>'+
+      '<div class="pmini-body"><div style="height:11px;background:#F5EDE0;border-radius:5px;margin-bottom:5px"></div>'+
+      '<div style="height:10px;background:#F5EDE0;border-radius:5px;width:50%"></div></div></div>';
+  }
+  document.getElementById('snapMoreGrid').innerHTML=miniSkels;
+}
+
+function fetchRealProducts(item){
+  fetch('/api/products',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({type:item.type,color:item.color,brand:item.brand,cat:item.cat})
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data.fallback||!data.products||data.products.length===0){
+      renderStoreFallback(item);
+    } else {
+      renderRealProducts(data.products,item);
+    }
+  })
+  .catch(function(){renderStoreFallback(item);});
+}
+
+function renderRealProducts(products,item){
+  var top=products.slice(0,2);
+  var more=products.slice(2,8);
+  var labels=['⭐ הכי מתאים','🔄 חלופה'];
+  document.getElementById('snapTopGrid').innerHTML=top.map(function(p,i){
+    var imgHtml=p.image
+      ?'<img src="'+p.image+'" alt="'+p.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px" onerror="this.style.display=\'none\'">'
+      :'<span style="font-size:28px">👕</span>';
+    var stars=p.rating?'<span style="color:#f59e0b;font-size:10px">★ '+p.rating+'</span> ':'';
+    return'<div class="store-card" style="position:relative">'+
+      '<div class="store-card-badge">'+labels[i]+'</div>'+
+      '<div class="store-card-logo" style="background:var(--caramel-light);overflow:hidden">'+imgHtml+'</div>'+
+      '<div class="store-card-info">'+
+        '<div class="store-card-name">'+p.name.substring(0,40)+(p.name.length>40?'…':'')+'</div>'+
+        '<div class="store-card-desc">'+p.store+(p.rating?' · '+stars:'')+'</div>'+
+        '<div class="store-card-price">'+(p.price||'')+'</div>'+
+      '</div>'+
+      '<a href="'+p.url+'" target="_blank"><button class="store-card-btn">לרכישה ↗</button></a>'+
+    '</div>';
+  }).join('');
+  document.getElementById('snapMoreGrid').innerHTML=more.map(function(p){
+    var imgHtml=p.image
+      ?'<img src="'+p.image+'" alt="'+p.name+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'">'
+      :'<span style="font-size:20px">👕</span>';
+    return'<a href="'+p.url+'" target="_blank" style="text-decoration:none">'+
+      '<div class="pmini">'+
+        '<div class="pmini-img" style="overflow:hidden">'+imgHtml+'</div>'+
+        '<div class="pmini-body">'+
+          '<div class="pmini-name">'+p.name.substring(0,30)+(p.name.length>30?'…':'')+'</div>'+
+          '<div class="pmini-store">'+p.store+'</div>'+
+          '<div class="pmini-price">'+(p.price||'חפש ↗')+'</div>'+
+        '</div>'+
+      '</div>'+
+    '</a>';
+  }).join('');
+}
+
+function renderStoreFallback(item){
+  var q=buildSearchQuery(item);
+  var stores=getStoresForCategory(item.cat);
+  var featured=stores.slice(0,2);
+  var more=stores.slice(2);
+  var labels=['⭐ הכי מתאים','🔄 חלופה'];
+  document.getElementById('snapTopGrid').innerHTML=featured.map(function(s,i){
+    return'<div class="store-card" style="position:relative">'+
+      '<div class="store-card-badge">'+labels[i]+'</div>'+
+      '<div class="store-card-logo" style="background:'+s.bg+';color:'+s.fg+';font-size:22px;font-weight:900;flex-direction:column;gap:4px">'+
+        '<span>'+s.emoji+'</span>'+
+      '</div>'+
+      '<div class="store-card-info">'+
+        '<div class="store-card-name">'+s.name+'</div>'+
+        '<div class="store-card-desc">'+item.type+(item.color?' · '+item.color:'')+'</div>'+
+        '<div class="store-card-price">חיפוש חי ↗</div>'+
+      '</div>'+
+      '<a href="'+s.url(q)+'" target="_blank"><button class="store-card-btn">חפש ↗</button></a>'+
+    '</div>';
+  }).join('');
+  document.getElementById('snapMoreGrid').innerHTML=more.map(function(s){
+    return'<a href="'+s.url(q)+'" target="_blank" style="text-decoration:none">'+
+      '<div class="pmini">'+
+        '<div class="pmini-img" style="background:'+s.bg+';color:'+s.fg+';font-size:16px;font-weight:900;flex-direction:column;gap:2px">'+
+          '<span style="font-size:18px">'+s.emoji+'</span><span style="font-size:9px">'+s.name+'</span>'+
+        '</div>'+
+        '<div class="pmini-body">'+
+          '<div class="pmini-name">'+item.type+'</div>'+
+          '<div class="pmini-store">'+s.name+'</div>'+
+          '<div class="pmini-price">חפש ↗</div>'+
+        '</div>'+
+      '</div>'+
+    '</a>';
+  }).join('');
+}
+
+// ══════════════════ SOCIAL ══════════════════
+let socialImgUrl=null, socialActive=1, socialItems=[], socialBase64=null, socialMime=null;
+const catDotPos={
+  tops:{top:'22%',left:'48%'},outerwear:{top:'28%',left:'35%'},
+  bottoms:{top:'62%',left:'42%'},footwear:{top:'84%',left:'58%'},
+  accessories:{top:'18%',left:'72%'},default:{top:'40%',left:'50%'},
+};
+
+function handleSocial(e){
+  const f=e.target.files[0];if(!f)return;
+  socialImgUrl=URL.createObjectURL(f);
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const parts=ev.target.result.split(',');
+    socialBase64=parts[1];
+    socialMime=f.type||'image/jpeg';
+    startSocialScan();
+  };
+  reader.readAsDataURL(f);
+}
+
+let socialLinkPlatform='instagram';
+function showSocialLinkInput(platform){
+  socialLinkPlatform=platform;
+  const box=document.getElementById('socialLinkBox');
+  const title=document.getElementById('socialLinkTitle');
+  const input=document.getElementById('socialLinkInput');
+  const names={instagram:'Instagram',tiktok:'TikTok'};
+  title.textContent='הדבק לינק מ-'+names[platform];
+  input.placeholder=platform==='instagram'?'https://www.instagram.com/p/...':'https://www.tiktok.com/@.../video/...';
+  input.value='';
+  box.style.display=box.style.display==='none'?'block':'none';
+}
+function handleSocialLink(){
+  const url=document.getElementById('socialLinkInput').value.trim();
+  if(!url){showToast('הדבק לינק תחילה');return;}
+  showToast('פיצ\'ר זה יגיע בקרוב');
+}
+
+function startSocialScan(){
+  go('s-social-scan');
+  setImg('socialScanImg','socialScanPh',socialImgUrl,'👗');
+  let animDone=false, apiDone=false, apiItems=null;
+  function tryFinish(){
+    if(!animDone||!apiDone)return;
+    if(apiItems&&apiItems.length>0){
+      socialItems=apiItems.map((item,i)=>({
+        ...item,id:i+1,n:i+1,
+        sub:[item.color,item.style||item.brand].filter(Boolean).join(' · '),
+        color:item.hex||'#C4956A',
+        ...(catDotPos[item.cat]||catDotPos.default),
+      }));
+    }
+    if(socialItems.length===0){showToast('לא זוהו פריטים. נסה תמונה אחרת');go('s-social-upload');return;}
+    socialActive=socialItems[0].id;
+    document.getElementById('s-social-results').querySelector('h1').textContent='זוהו '+socialItems.length+' פריטים';
+    showSocialResults();
+    go('s-social-results');
+  }
+  runScan(['sc1','sc2','sc3'],['sc1i','sc2i','sc3i'],()=>{animDone=true;tryFinish();});
+  if(socialBase64){
+    fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({image:socialBase64,mimeType:socialMime})})
+    .then(r=>{if(!r.ok)throw new Error();return r.json();})
+    .then(data=>{if(data.items&&data.items.length>0)apiItems=data.items;apiDone=true;tryFinish();})
+    .catch(()=>{apiDone=true;tryFinish();});
+  } else { apiDone=true; }
+}
+
+function showSocialResults(){
+  setImg('socialTagImg','socialTagPh',socialImgUrl,'👗');
+  const wrap=document.getElementById('socialTagWrap');
+  document.querySelectorAll('.dot').forEach(d=>d.remove());
+  socialItems.forEach(item=>{
+    const d=document.createElement('div');
+    d.className='dot'+(item.id===socialActive?' active':'');
+    d.id='dot-'+item.id;d.textContent=item.n;
+    d.style.top=item.top;d.style.left=item.left;
+    d.onclick=()=>selSocial(item.id);
+    wrap.appendChild(d);
+  });
+  renderSocialChips();
+  renderSocialShop(socialActive);
+}
+
+function renderSocialChips(){
+  document.getElementById('socialChips').innerHTML=socialItems.map(item=>`
+    <div class="chip${item.id===socialActive?' active':''}" id="chip-${item.id}" onclick="selSocial(${item.id})">
+      <div class="chip-num">${item.n}</div>
+      <div class="chip-color" style="background:${item.hex||item.color||'#C4956A'}"></div>
+      <div class="chip-info">
+        <div class="chip-name">${item.type||item.name}</div>
+        <div class="chip-sub">${[item.color,item.brand].filter(Boolean).join(' · ')||item.sub||''}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderSocialShop(id){
+  const item=socialItems.find(i=>i.id===id);if(!item)return;
+  const shopEl=document.getElementById('socialShop');
+  shopEl.innerHTML=
+    '<div class="shop-lbl">פריט '+item.n+' <span>· '+(item.type||item.name)+'</span></div>'+
+    '<div id="socialProdGrid" style="margin-top:8px"><div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">מחפש מוצרים...</div></div>'+
+    '<button class="stl-btn" style="margin-top:12px" onclick="shopFullLook()">Shop the Full Look</button>';
+  fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({type:item.type||item.name,color:item.color,brand:item.brand||'',cat:item.cat,gender:item.gender})})
+  .then(r=>r.json())
+  .then(data=>{
+    const grid=document.getElementById('socialProdGrid');if(!grid)return;
+    if(!data.products||data.products.length===0){grid.innerHTML=renderSocialStoreFallback(item);return;}
+    grid.innerHTML='<div class="prod-g3">'+data.products.slice(0,3).map(p=>{
+      const img=p.image?`<img src="${p.image}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:'';
+      return`<a href="${p.url}" target="_blank" style="text-decoration:none">
+        <div class="prd"><div class="prd-img" style="overflow:hidden">${img}</div>
+        <div class="prd-bd"><div class="prd-nm">${p.name.substring(0,28)}${p.name.length>28?'…':''}</div>
+        <div class="prd-st">${p.store}</div><div class="prd-pr">${p.price||'חפש ↗'}</div></div></div></a>`;
+    }).join('')+'</div>';
+  })
+  .catch(()=>{const grid=document.getElementById('socialProdGrid');if(grid)grid.innerHTML=renderSocialStoreFallback(item);});
+}
+
+function renderSocialStoreFallback(item){
+  const q=buildSearchQuery({type:item.type||item.name,color:item.color,cat:item.cat,brand:''});
+  return'<div class="prod-g3">'+STORES.slice(0,3).map(s=>
+    `<a href="${s.url(q)}" target="_blank" style="text-decoration:none">
+      <div class="prd"><div class="prd-img" style="background:${s.bg};color:${s.fg};flex-direction:column;gap:2px">
+        <span style="font-size:18px">${s.emoji}</span><span style="font-size:8px;font-weight:700">${s.name}</span>
+      </div><div class="prd-bd"><div class="prd-nm">${item.type||item.name}</div>
+      <div class="prd-st">${s.name}</div><div class="prd-pr">חפש ↗</div></div></div></a>`
+  ).join('')+'</div>';
+}
+
+function shopFullLook(){showToast('פיצ\'ר זה יגיע בקרוב');}
+
+function selSocial(id){
+  socialActive=id;
+  document.querySelectorAll('.dot').forEach(d=>d.classList.remove('active'));
+  const dot=document.getElementById('dot-'+id);if(dot)dot.classList.add('active');
+  renderSocialChips();renderSocialShop(id);
+  document.getElementById('chip-'+id)?.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+}
+
+// ══════════════════ TWIN ══════════════════
+const twinData={
+  'Streetwear':{icon:'🧢',attrs:['Urban','Oversized','Monochrome','Sneaker Culture'],
+    b:{label:'💚 זול',total:380,c:'var(--green)',bg:'var(--green-bg)',items:[{e:'👕',bg:'#e8f5e9',name:'Oversized Tee',store:"H&M · שחור",price:59},{e:'👖',bg:'#f1f8e9',name:'Cargo Pants',store:"Pull&Bear · זית",price:149},{e:'👟',bg:'#f9fbe7',name:'Classic Sneakers',store:"Skechers · לבן",price:129},{e:'🧢',bg:'#e8f5e9',name:'Snapback Cap',store:"New Era · שחור",price:69}]},
+    m:{label:'💙 בינוני',total:890,c:'var(--blue)',bg:'var(--blue-bg)',items:[{e:'🤍',bg:'#e3f2fd',name:'Boxy Fit Tee',store:"Stüssy · לבן",price:199},{e:'👖',bg:'#e8eaf6',name:'Wide Leg Cargo',store:"Carhartt · חאקי",price:329},{e:'👟',bg:'#e3f2fd',name:'Air Force 1',store:"Nike · לבן",price:399},{e:'🕶️',bg:'#e8eaf6',name:'Shield Sunglasses',store:"QUAY · שחור",price:159}]},
+    p:{label:'💜 פרמיום',total:2890,c:'var(--caramel)',bg:'var(--caramel-light)',items:[{e:'⚫',bg:'#fdf6ee',name:'Heavyweight Tee',store:"Off-White · שחור",price:749},{e:'👖',bg:'#fdf6ee',name:'Utility Trousers',store:"Rick Owens · שחור",price:1199},{e:'👟',bg:'#fdf6ee',name:'Yeezy Boost',store:"Adidas · שחור",price:899},{e:'🎒',bg:'#fdf6ee',name:'Mini Backpack',store:"Supreme · לוגו",price:450}]}},
+  'Business Casual':{icon:'👔',attrs:['Smart','Clean Cut','Neutral Tones','Polished'],
+    b:{label:'💚 זול',total:450,c:'var(--green)',bg:'var(--green-bg)',items:[{e:'👔',bg:'#e3f2fd',name:'Oxford Shirt',store:"Zara · כחול",price:129},{e:'👖',bg:'#f5f5f5',name:'Slim Chinos',store:"H&M · בז'",price:99},{e:'👞',bg:'#fafafa',name:'Derby Shoes',store:"ALDO · חום",price:199},{e:'⌚',bg:'#f5f5f5',name:'Classic Watch',store:"Casio · כסף",price:149}]},
+    m:{label:'💙 בינוני',total:1290,c:'var(--blue)',bg:'var(--blue-bg)',items:[{e:'🟦',bg:'#e3f2fd',name:'Linen Shirt',store:"J.Crew · נייבי",price:299},{e:'👖',bg:'#f5f5f5',name:'Tailored Trousers',store:"BR · אפור",price:349},{e:'👞',bg:'#fafafa',name:'Chelsea Boots',store:"Clark's · שחור",price:449},{e:'🧥',bg:'#e3f2fd',name:'Blazer',store:"Massimo Dutti · כחול",price:599}]},
+    p:{label:'💜 פרמיום',total:4200,c:'var(--caramel)',bg:'var(--caramel-light)',items:[{e:'👔',bg:'#fdf6ee',name:'Dress Shirt',store:"Tom Ford · לבן",price:899},{e:'🩳',bg:'#fdf6ee',name:'Wool Trousers',store:"Brioni · אפור",price:1499},{e:'👞',bg:'#fdf6ee',name:'Oxford Shoes',store:"John Lobb · שחור",price:1599},{e:'⌚',bg:'#fdf6ee',name:'Dress Watch',store:"Tissot · זהב",price:1299}]}},
+  'Boho Chic':{icon:'🌸',attrs:['Flowy','Earthy Tones','Layering','Vintage'],
+    b:{label:'💚 זול',total:340,c:'var(--green)',bg:'var(--green-bg)',items:[{e:'👗',bg:'#fce4ec',name:'Flowy Midi Dress',store:"Shein · פרחוני",price:89},{e:'👜',bg:'#fff8e1',name:'Woven Bag',store:"Primark · חום",price:79},{e:'👡',bg:'#fff8e1',name:'Sandals',store:"ASOS · טן",price:99},{e:'📿',bg:'#fce4ec',name:'Layered Necklaces',store:"H&M · זהב",price:69}]},
+    m:{label:'💙 בינוני',total:990,c:'var(--blue)',bg:'var(--blue-bg)',items:[{e:'🌸',bg:'#fce4ec',name:'Linen Maxi Dress',store:"Free People · טרקוטה",price:349},{e:'🤎',bg:'#fff8e1',name:'Leather Crossbody',store:"Mango · קוניאק",price:249},{e:'👡',bg:'#fff8e1',name:'Platform Sandals',store:"Steve Madden · בז'",price:229},{e:'💍',bg:'#fce4ec',name:'Stacked Rings',store:"Gorjana · זהב",price:169}]},
+    p:{label:'💜 פרמיום',total:3500,c:'var(--caramel)',bg:'var(--caramel-light)',items:[{e:'🎀',bg:'#fdf6ee',name:'Silk Slip Dress',store:"Zimmermann · פרחוני",price:1299},{e:'👜',bg:'#fdf6ee',name:'Woven Tote',store:"Bottega Veneta · קמל",price:1499},{e:'👡',bg:'#fdf6ee',name:'Espadrille Wedge',store:"Sam Edelman · לבן",price:399},{e:'📿',bg:'#fdf6ee',name:'Gold Chain Set',store:"Mejuri · זהב 14K",price:549}]}},
+  'Old Money':{icon:'🎩',attrs:['Classic','Understated','Quality Fabrics','Timeless'],
+    b:{label:'💚 זול',total:520,c:'var(--green)',bg:'var(--green-bg)',items:[{e:'🤍',bg:'#f5f5f5',name:'Polo Shirt',store:"Zara · קרם",price:119},{e:'🩳',bg:'#f5f5f5',name:'Chino Shorts',store:"H&M · נייבי",price:99},{e:'👟',bg:'#fafafa',name:'Canvas Sneakers',store:"Superga · לבן",price:169},{e:'👜',bg:'#f5f5f5',name:'Canvas Tote',store:"L.L.Bean · נייבי",price:139}]},
+    m:{label:'💙 בינוני',total:1650,c:'var(--blue)',bg:'var(--blue-bg)',items:[{e:'🏇',bg:'#e3f2fd',name:'Classic Polo',store:"Ralph Lauren · לבן",price:399},{e:'👖',bg:'#f5f5f5',name:'Slim Chinos',store:"J.Crew · חאקי",price:299},{e:'👟',bg:'#fafafa',name:'Boat Shoes',store:"Sperry · טן",price:449},{e:'⌚',bg:'#f5f5f5',name:'Field Watch',store:"Timex · ירוק",price:499}]},
+    p:{label:'💜 פרמיום',total:5800,c:'var(--caramel)',bg:'var(--caramel-light)',items:[{e:'🏇',bg:'#fdf6ee',name:'Pique Polo',store:"Loro Piana · כחול",price:1499},{e:'🩳',bg:'#fdf6ee',name:'Wool Shorts',store:"Incotex · קרם",price:899},{e:'👟',bg:'#fdf6ee',name:'Sneakers',store:"Common Projects · לבן",price:1499},{e:'⌚',bg:'#fdf6ee',name:'Dress Watch',store:"Cartier · כסף",price:6999}]}},
+  'Techwear':{icon:'🖤',attrs:['Functional','Dark Palette','Utility Pockets','Futuristic'],
+    b:{label:'💚 זול',total:590,c:'var(--green)',bg:'var(--green-bg)',items:[{e:'🖤',bg:'#f5f5f5',name:'Windbreaker',store:"Decathlon · שחור",price:149},{e:'👖',bg:'#f5f5f5',name:'Jogger Cargo',store:"Zara · שחור",price:129},{e:'👟',bg:'#fafafa',name:'Trail Sneaker',store:"NB · שחור",price:249},{e:'🎒',bg:'#f5f5f5',name:'Utility Pouch',store:"Decathlon · שחור",price:69}]},
+    m:{label:'💙 בינוני',total:1890,c:'var(--blue)',bg:'var(--blue-bg)',items:[{e:'🌧️',bg:'#e8eaf6',name:'Shell Jacket',store:"Arc\'teryx · שחור",price:799},{e:'👖',bg:'#f5f5f5',name:'Cargo Pants',store:"Nike ACG · אפור",price:449},{e:'👟',bg:'#fafafa',name:'React Trail',store:"Nike · שחור",price:499},{e:'🎒',bg:'#e8eaf6',name:'Crossbody Bag',store:"Cote&Ciel · שחור",price:349}]},
+    p:{label:'💜 פרמיום',total:6500,c:'var(--caramel)',bg:'var(--caramel-light)',items:[{e:'⚡',bg:'#fdf6ee',name:'Gore-Tex Jacket',store:"ACRONYM · שחור",price:2499},{e:'👖',bg:'#fdf6ee',name:'Schoeller Pants',store:"ACRONYM · שחור",price:1499},{e:'👟',bg:'#fdf6ee',name:'Gel-Nimbus',store:"Asics · שחור",price:899},{e:'🎒',bg:'#fdf6ee',name:'Urban Pack',store:"Arc\'teryx · שחור",price:1599}]}},
+  'Y2K':{icon:'💿',attrs:['Colorful','Low Rise','Butterfly','Nostalgic 2000s'],
+    b:{label:'💚 זול',total:320,c:'var(--green)',bg:'var(--green-bg)',items:[{e:'💗',bg:'#fce4ec',name:'Baby Tee',store:"Shein · ורוד",price:49},{e:'👖',bg:'#e3f2fd',name:'Low Rise Flare',store:"H&M · ג'ינס",price:99},{e:'👟',bg:'#fff8e1',name:'Platform Sneakers',store:"Bershka · לבן",price:129},{e:'👜',bg:'#fce4ec',name:'Mini Bag',store:"Primark · כסף",price:49}]},
+    m:{label:'💙 בינוני',total:890,c:'var(--blue)',bg:'var(--blue-bg)',items:[{e:'⭐',bg:'#fce4ec',name:'Rhinestone Top',store:"Urban Outfitters · כחול",price:199},{e:'👖',bg:'#e3f2fd',name:'Flare Jeans',store:"Levi\'s · ג'ינס",price:299},{e:'👠',bg:'#fff8e1',name:'Mule Heels',store:"Steve Madden · ורוד",price:249},{e:'🦋',bg:'#fce4ec',name:'Butterfly Bag',store:"ASOS · כסף",price:149}]},
+    p:{label:'💜 פרמיום',total:3200,c:'var(--caramel)',bg:'var(--caramel-light)',items:[{e:'💎',bg:'#fdf6ee',name:'Crystal Top',store:"Versace · שחור",price:1199},{e:'👖',bg:'#fdf6ee',name:'Low Rise Jeans',store:"Diesel · vintage",price:799},{e:'👠',bg:'#fdf6ee',name:'Platform Mules',store:"Prada · ורוד",price:1199},{e:'👜',bg:'#fdf6ee',name:'Mini Bag',store:"Fendi · כסף",price:899}]}},
+};
+
+let twinImgUrl=null,twinStyle='Streetwear',twinBudget='b';
+function handleTwin(e){const f=e.target.files[0];if(!f)return;twinImgUrl=URL.createObjectURL(f);startTwin('Streetwear');}
+function startTwin(style){
+  twinStyle=style;twinBudget='b';
+  go('s-twin-analyze');
+  const data=twinData[style];
+  setImg('twinAnlImg','twinAnlPh',twinImgUrl,data.icon);
+  const lbl=document.getElementById('twinAnlLbl'),sub=document.getElementById('twinAnlSub');
+  const attrs=document.getElementById('twinAttrs');attrs.innerHTML='';
+  const msgs=[['מזהה צבעים...','סורק פלטת הצבעים'],['מנתח חיתוכים...','בודק סילואטים ופרופורציות'],['מזהה סגנון...','מתאים לטרנדים עכשוויים'],[style+' ✨','זוהה הסגנון בהצלחה!']];
+  msgs.forEach((m,i)=>setTimeout(()=>{lbl.textContent=m[0];sub.textContent=m[1];},i*600));
+  data.attrs.forEach((a,i)=>setTimeout(()=>{const c=document.createElement('div');c.className='attr';c.textContent=a;attrs.appendChild(c);requestAnimationFrame(()=>c.classList.add('show'));},800+i*250));
+  setTimeout(()=>{showTwinResults(style);go('s-twin-results');},2900);
+}
+function showTwinResults(style){
+  const data=twinData[style];
+  document.getElementById('twinResultTitle').textContent=style+' Twin';
+  document.getElementById('twinIdStyle').textContent=style;
+  setImg('twinIdImg','twinIdPh',twinImgUrl,data.icon);
+  document.getElementById('twinIdTags').innerHTML=data.attrs.map(a=>`<span class="id-tag">${a}</span>`).join('');
+  selBudget('b');
+}
+function selBudget(t){
+  twinBudget=t;
+  ['b','m','p'].forEach(x=>{const el=document.getElementById('bt-'+x);el.className='btab '+x+(x===t?' ab':'');});
+  const tier=twinData[twinStyle][t];
+  const desc={b:'לוק מלא בתקציב נוח',m:'איכות טובה במחיר הוגן',p:'חווית מותג פרמיום'}[t];
+  document.getElementById('twinLookPanel').innerHTML=`
+    <div class="look-hdr">
+      <div class="look-hdr-l"><h3>${tier.label}</h3><p>${desc}</p></div>
+      <div class="total-tag" style="background:${tier.bg};color:${tier.c}">₪${tier.total.toLocaleString()}</div>
+    </div>
+    <div class="look-items">${tier.items.map(it=>`
+      <div class="litem">
+        <div class="litem-ico" style="background:${it.bg}">${it.e}</div>
+        <div class="litem-info"><div class="litem-name">${it.name}</div><div class="litem-store">${it.store}</div></div>
+        <div class="litem-price" style="color:${tier.c}">₪${it.price}</div>
+      </div>`).join('')}</div>
+    <div class="insp-note"><span>💡</span><span>לוק <strong>בהשראת</strong> הסגנון — לא עתק מדויק.</span></div>
+    <button class="buy-btn" style="background:var(--caramel);color:#fff" onclick="showToast('🛒 קונה לוק! ₪${tier.total.toLocaleString()}')">🛒 קנה את הלוק המלא · ₪${tier.total.toLocaleString()}</button>`;
+}
+
+// ══════════════════ PERSISTENCE ══════════════════
+let wardrobeItems=[];
+let wishlistItems=[];
+let recentScans=[];
+
+function saveToStorage(){
+  try{
+    localStorage.setItem('styleSnap_wardrobe',JSON.stringify(wardrobeItems));
+    localStorage.setItem('styleSnap_wishlist',JSON.stringify(wishlistItems));
+    localStorage.setItem('styleSnap_recentScans',JSON.stringify(recentScans));
+  }catch(e){}
+}
+
+const DATA_VERSION='3';
+function loadFromStorage(){
+  try{
+    if(localStorage.getItem('styleSnap_dataVersion')!==DATA_VERSION){
+      localStorage.removeItem('styleSnap_wardrobe');
+      localStorage.removeItem('styleSnap_wishlist');
+      localStorage.removeItem('styleSnap_recentScans');
+      localStorage.setItem('styleSnap_dataVersion',DATA_VERSION);
+    }
+    const w=localStorage.getItem('styleSnap_wardrobe');
+    const wl=localStorage.getItem('styleSnap_wishlist');
+    const rs=localStorage.getItem('styleSnap_recentScans');
+    if(w) wardrobeItems=JSON.parse(w);
+    if(wl) wishlistItems=JSON.parse(wl);
+    if(rs) recentScans=JSON.parse(rs);
+  }catch(e){}
+}
+
+function updateStats(){
+  const wc=wardrobeItems.length;
+  const wlc=wishlistItems.length;
+  const wlTotal=wishlistItems.reduce((s,i)=>s+i.price,0);
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+  set('homeSnapCount',recentScans.length);
+  set('homeWardrobeCount',wc);
+  set('homeWishlistCount',wlc);
+  set('homeWardrobeSub',wc+' פריטים');
+  set('wardrobeHeader',wc+' פריטים');
+  set('wardrobeHeroNum',wc);
+  set('wishlistHeader',wlc+' פריטים שמורים');
+  set('wishlistBannerTotal','₪'+wlTotal.toLocaleString());
+  const cats={tops:0,bottoms:0,footwear:0,accessories:0};
+  wardrobeItems.forEach(i=>{if(cats[i.cat]!==undefined)cats[i.cat]++;});
+  set('catTops',cats.tops);
+  set('catBottoms',cats.bottoms);
+  set('catFootwear',cats.footwear);
+  set('catAccessories',cats.accessories);
+}
+
+let currentWardrobeFilter='all';
+function renderWardrobe(filter){
+  if(filter!==undefined) currentWardrobeFilter=filter;
+  const grid=document.getElementById('wardrobeGrid');if(!grid) return;
+  const filtered=currentWardrobeFilter==='all'?wardrobeItems:wardrobeItems.filter(i=>i.cat===currentWardrobeFilter);
+  const catSvg={
+    tops:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H5v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h1.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>`,
+    bottoms:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>`,
+    footwear:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20M2 12c0 4 4 7 10 7s10-3 10-7"/><path d="M6 12V7a6 6 0 0 1 12 0v5"/></svg>`,
+    accessories:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="10"/><line x1="12" y1="12" x2="12" y2="8"/><line x1="12" y1="12" x2="15" y2="12"/></svg>`,
+    default:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H5v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h1.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>`,
+  };
+  grid.innerHTML=filtered.map(item=>{
+    const hex=item.hex||'#C4956A';
+    const iconColor=item.hex?shadeHex(item.hex,-40):'#7a5530';
+    const svg=catSvg[item.cat]||catSvg.default;
+    const imgContent = item.image
+      ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:contain;position:absolute;inset:0;" onerror="this.style.display='none'">`
+      : svg;
+    const imgBg = item.image ? '' : `background:linear-gradient(145deg,${hex}33,${hex}66);`;
+    return`<div class="witem">
+      <div class="witem-img" style="${imgBg}color:${iconColor}">${imgContent}</div>
+      <div class="witem-info">
+        <div class="witem-name">${item.name}</div>
+        <div class="witem-meta">${item.meta||''}</div>
+      </div>
+    </div>`;
+  }).join('')+`
+    <div class="add-witem" onclick="navTo('s-snap-upload','nav-snap')">
+      <div class="add-icon">＋</div>
+      <div class="add-lbl">הוסף פריט</div>
+    </div>`;
+}
+
+function renderWishlist(){
+  const list=document.getElementById('wishList');if(!list) return;
+  if(wishlistItems.length===0){
+    list.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">❤️</div><div style="font-size:14px;font-weight:600">הרשימה ריקה</div><div style="font-size:12px;margin-top:4px">הוסף פריטים מה-Snap</div></div>';
+    return;
+  }
+  list.innerHTML=wishlistItems.map(item=>`
+    <div class="wish-item">
+      <div class="wish-item-img" style="background:${item.bg}">${item.emoji}</div>
+      <div class="wish-item-info">
+        <div class="wish-item-name">${item.name}</div>
+        <div class="wish-item-store">${item.store}</div>
+        <div class="wish-price-row">
+          <span class="wish-price">₪${item.price}</span>
+          ${item.orig?`<span class="wish-price-orig">₪${item.orig}</span>`:''}
+          ${item.discount?`<span class="wish-badge">${item.discount}</span>`:''}
+          ${item.alert?`<span class="wish-badge alert">${item.alert}</span>`:''}
+        </div>
+      </div>
+      <div class="wish-actions">
+        <button class="wish-buy" onclick="showToast('פותח ${item.name} ↗')">קנה</button>
+        <button class="wish-remove" onclick="removeWishlistItem(${item.id})">הסר</button>
+      </div>
+    </div>`).join('');
+}
+
+function removeWishlistItem(id){
+  wishlistItems=wishlistItems.filter(i=>i.id!==id);
+  saveToStorage();renderWishlist();updateStats();showToast('הוסר ❌');
+}
+
+function setFilter(el,cat){
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderWardrobe(cat);
+}
+
+// Bottom-nav clone to all screens
+(function(){
+  const navHTML=document.querySelector('.bottom-nav').outerHTML;
+  document.querySelectorAll('.screen').forEach(s=>{
+    if(!s.querySelector('.bottom-nav')){
+      s.insertAdjacentHTML('beforeend',navHTML);
+    }
+  });
+})();
+</script>
+</body>
 </html>
