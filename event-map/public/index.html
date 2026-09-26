@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מפת אירועים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Rubik:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <h1>מפת אירועים</h1>
+    <span class="dateline" id="dateline">NEWS → US EQUITIES</span>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="news">חדשות</button>
+    <button role="tab" aria-selected="false" data-tab="new">ניתוח חדש</button>
+    <button role="tab" aria-selected="false" data-tab="log">יומן תרחישים</button>
+  </nav>
+
+  <!-- NEWS FEED -->
+  <section id="tab-news">
+    <div class="chips" id="srcChips"></div>
+    <div class="newsbar">
+      <input type="search" id="nq" placeholder="סינון כותרות: oil, Taiwan, tariffs…">
+      <button class="btn ghost" id="nrefresh" type="button">רענן</button>
+    </div>
+    <p class="hint" id="nstatus"></p>
+    <div class="news" id="newsList"></div>
+  </section>
+
+  <!-- NEW ANALYSIS -->
+  <section id="tab-new" hidden>
+    <form class="card stack" id="form">
+      <div>
+        <label class="lbl" for="url">קישור לכתבה (לא חובה)</label>
+        <div class="urlrow">
+          <input type="url" id="url" placeholder="https://www.reuters.com/…">
+          <button class="btn ghost" id="pull" type="button">משוך טקסט</button>
+        </div>
+      </div>
+      <div>
+        <label class="lbl" for="ev">האירוע — טקסט, ציטוט מכתבה או ציוץ</label>
+        <textarea id="ev" placeholder="לדוגמה: סין הודיעה על הסגר ימי מלא סביב טייוואן החל מהלילה. ספינות מסחר מופנות לנמלים סיניים לבדיקה."></textarea>
+      </div>
+      <div>
+        <span class="lbl">מצב</span>
+        <div class="modes">
+          <label><input type="radio" name="mode" value="real" checked><b>אמיתי</b><small>קרה עכשיו — לרשום לפני הפתיחה</small></label>
+          <label><input type="radio" name="mode" value="pre"><b>תרחיש מראש</b><small>עוד לא קרה — פיצול A/B</small></label>
+          <label><input type="radio" name="mode" value="imaginary"><b>דמיוני</b><small>להדגמה בלבד</small></label>
+        </div>
+      </div>
+      <label class="chk" id="verifyWrap"><input type="checkbox" id="verify" checked> לאמת מול אתרי חדשות (Reuters, AP, Bloomberg…) לפני הניתוח</label>
+      <div>
+        <label class="lbl" for="img">צילום מסך של ציוץ / כתבה (לא חובה)</label>
+        <input type="file" id="img" class="file" accept="image/jpeg,image/png,image/webp,image/gif">
+      </div>
+      <div class="row">
+        <button class="btn primary" id="go" type="submit">נתח אירוע</button>
+        <button class="btn ghost" id="stop" type="button" hidden>עצור</button>
+        <span class="hint" id="status"></span>
+      </div>
+      <div class="notice" id="avail" hidden></div>
+      <div class="log" id="log" hidden></div>
+    </form>
+
+    <div id="intro">
+      <h2 class="sec">איך זה עובד</h2>
+      <div class="how">
+        <div>בוחרים כותרת מפיד החדשות או מדביקים קישור / טקסט / צילום מסך</div>
+        <div>Claude מאמת מול אתרי חדשות, מתייג (one-off / process) ובוחר 12–15 מועמדים + מדדים</div>
+        <div>השרת מביא שנה של מחירים: סגירה, 1M, σ של גאפים, סף 2σ</div>
+        <div>10 הסופיות לפי ציון חשיפה → נשמר ביומן למעקב</div>
+      </div>
+      <p class="hint" style="margin-top:12px">הכללים מבוססים על מחקר 40 האירועים (v2). הם השערות — לא הוכחה ולא המלצת השקעה.</p>
+    </div>
+
+    <div id="result"></div>
+  </section>
+
+  <!-- LOG -->
+  <section id="tab-log" hidden>
+    <div class="notice" id="dbNote" hidden></div>
+    <div class="list" id="list"><p class="hint">טוען…</p></div>
+    <div id="detail"></div>
+  </section>
+
+  <p class="foot">כלי מחקר. לא המלצה ולא פקודת מסחר. ניתוח: Claude API במפתח של מי שמריץ את השרת · מחירים: Yahoo Finance / Stooq (לא בזמן אמת) · חדשות: פידי RSS של המקורות.</p>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "event-map",
+  "private": true,
+  "version": "1.0.0",
+  "description": "מפת אירועים — news event → US equities mapper (standalone server)",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
+    "fast-xml-parser": "^5.11.1"
+  }
+}
