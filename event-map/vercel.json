@@ -1,0 +1,10 @@
+{
+  "buildCommand": "",
+  "outputDirectory": "public",
+  "functions": {
+    "api/analyze.js": { "maxDuration": 300 },
+    "api/news.js": { "maxDuration": 30 },
+    "api/article.js": { "maxDuration": 30 },
+    "api/prices.js": { "maxDuration": 30 }
+  }
+}

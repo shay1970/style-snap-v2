@@ -14,6 +14,14 @@
     <h1>מפת אירועים</h1>
     <span class="dateline" id="dateline">NEWS → US EQUITIES</span>
   </header>
+  <div class="card" id="lock" hidden style="margin-top:12px">
+    <form class="stack" id="lockForm">
+      <label class="lbl" for="pw">סיסמת גישה</label>
+      <input type="password" id="pw" autocomplete="current-password" required>
+      <div class="row"><button class="btn primary" type="submit">כניסה</button><span class="hint" id="lockMsg"></span></div>
+      <p class="hint">הסיסמה היא הערך של APP_PASSWORD בהגדרות השרת. היא נשמרת בדפדפן הזה.</p>
+    </form>
+  </div>
   <nav class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="news">חדשות</button>
     <button role="tab" aria-selected="false" data-tab="new">ניתוח חדש</button>
@@ -73,7 +81,7 @@
         <div>בוחרים כותרת מפיד החדשות או מדביקים קישור / טקסט / צילום מסך</div>
         <div>Claude מאמת מול אתרי חדשות, מתייג (one-off / process) ובוחר 12–15 מועמדים + מדדים</div>
         <div>השרת מביא שנה של מחירים: סגירה, 1M, σ של גאפים, סף 2σ</div>
-        <div>10 הסופיות לפי ציון חשיפה → נשמר ביומן למעקב</div>
+        <div>10 הסופיות לפי ציון חשיפה → נשמר ביומן (בדפדפן) למעקב</div>
       </div>
       <p class="hint" style="margin-top:12px">הכללים מבוססים על מחקר 40 האירועים (v2). הם השערות — לא הוכחה ולא המלצת השקעה.</p>
     </div>
@@ -83,12 +91,11 @@
 
   <!-- LOG -->
   <section id="tab-log" hidden>
-    <div class="notice" id="dbNote" hidden></div>
     <div class="list" id="list"><p class="hint">טוען…</p></div>
     <div id="detail"></div>
   </section>
 
-  <p class="foot">כלי מחקר. לא המלצה ולא פקודת מסחר. ניתוח: Claude API במפתח של מי שמריץ את השרת · מחירים: Yahoo Finance / Stooq (לא בזמן אמת) · חדשות: פידי RSS של המקורות.</p>
+  <p class="foot">כלי מחקר. לא המלצה ולא פקודת מסחר. ניתוח: Claude API במפתח של מי שמריץ את השרת · היומן נשמר בדפדפן · מחירים: Yahoo Finance / Stooq (לא בזמן אמת) · חדשות: פידי RSS של המקורות.</p>
 </div>
 <script src="app.js"></script>
 </body>

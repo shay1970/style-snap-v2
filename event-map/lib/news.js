@@ -1,10 +1,10 @@
-// External news: RSS/Atom feeds from sources.json, plus full-article extraction
+// External news: RSS/Atom feeds from lib/sources.js, plus full-article extraction
 // from a news URL the user pastes or picks from a feed.
-import { readFileSync } from 'node:fs';
 import { XMLParser } from 'fast-xml-parser';
 import { getText } from './http.js';
+import { SOURCES } from './sources.js';
 
-export const SOURCES = JSON.parse(readFileSync(process.env.SOURCES_FILE || new URL('../sources.json', import.meta.url), 'utf8'));
+export { SOURCES };
 
 const FEED_TTL_MS = 5 * 60 * 1000;
 const cache = new Map(); // id -> {at, items, error}

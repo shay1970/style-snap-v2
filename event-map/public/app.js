@@ -8,9 +8,26 @@ const hostOf = u => { try { return new URL(u).hostname; } catch { return u; } };
 const hasHebrew = s => /[֐-׿]/.test(s || "");
 $("#dateline").textContent = new Date().toISOString().slice(0,10) + " · NEWS → US EQUITIES";
 
+/* ---------- password ---------- */
+const getPw = () => { try { return localStorage.getItem("em.pw") || ""; } catch { return ""; } };
+const headers = () => ({ "content-type": "application/json", "x-app-password": getPw() });
+function showLock(msg) {
+  $("#lock").hidden = false; $("#lockMsg").textContent = msg || "";
+  document.body.classList.add("locked");
+  $("#pw").focus();
+}
+$("#lockForm").onsubmit = e => {
+  e.preventDefault();
+  try { localStorage.setItem("em.pw", $("#pw").value); } catch {}
+  $("#lock").hidden = true; $("#pw").value = "";
+  document.body.classList.remove("locked");
+  initNews();
+};
+
 async function api(path, opts = {}) {
-  const res = await fetch(path, { ...opts, headers: { "content-type": "application/json", ...(opts.headers || {}) } });
+  const res = await fetch(path, { ...opts, headers: { ...headers(), ...(opts.headers || {}) } });
   const body = res.status === 204 ? null : await res.json().catch(() => null);
+  if (res.status === 401) { showLock(getPw() ? "הסיסמה שגויה." : ""); throw new Error("נדרשת סיסמה"); }
   if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`);
   return body;
 }
@@ -26,6 +43,7 @@ document.querySelectorAll("nav.tabs button").forEach(b => b.onclick = () => show
 
 /* ---------- health ---------- */
 api("/api/health").then(h => {
+  if (h.passwordRequired && !getPw()) showLock();
   if (!h.claude) { $("#avail").hidden = false; $("#avail").textContent = "ANTHROPIC_API_KEY לא מוגדר בשרת — אי אפשר להריץ ניתוח."; $("#go").disabled = true; }
 }).catch(() => {});
 
@@ -141,7 +159,8 @@ $("#form").onsubmit = async e => {
   try {
     const payload = { text, mode, verify: $("#verify").checked, sourceUrl: $("#url").value.trim() || undefined };
     if (file) payload.image = { data: await fileToB64(file), mediaType: file.type };
-    const res = await fetch("/api/analyze", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload), signal: ctl.signal });
+    const res = await fetch("/api/analyze", { method: "POST", headers: headers(), body: JSON.stringify(payload), signal: ctl.signal });
+    if (res.status === 401) { showLock("הסיסמה שגויה."); throw new Error("נדרשת סיסמה"); }
     if (!res.ok) { const b = await res.json().catch(() => ({})); throw new Error(b.error || `HTTP ${res.status}`); }
     const reader = res.body.getReader(), dec = new TextDecoder();
     let buf = "";
@@ -156,7 +175,12 @@ $("#form").onsubmit = async e => {
         const ev = JSON.parse(line);
         if (ev.type === "log") log(ev.msg);
         else if (ev.type === "error") { showErr(ev.error); if (ev.detail) log("   " + ev.detail); gotResult = true; }
-        else if (ev.type === "result") { renderResult(ev.doc, $("#result")); status("מוכן."); gotResult = true; }
+        else if (ev.type === "result") {
+          gotResult = true;
+          if (ev.doc.mode !== "imaginary") log(logAdd(ev.doc) ? "③ נשמר ביומן (בדפדפן הזה)." : "③ השמירה ביומן נכשלה — הזיכרון של הדפדפן מלא או חסום.");
+          else log("③ דמיוני — לא נשמר ביומן.");
+          renderResult(ev.doc, $("#result")); status("מוכן.");
+        }
       }
     }
     if (!gotResult) showErr("החיבור לשרת נקטע לפני שהתקבלה תשובה.");
@@ -217,18 +241,44 @@ function renderResult(d, host){
     </div>`;
 }
 
-/* ---------- log tab ---------- */
+/* ---------- log tab (stored in this browser) ---------- */
+const LOG_KEY = "em.log", LOG_MAX = 300;
+function logRead(){ try { const v = JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } }
+function logWrite(list){ try { localStorage.setItem(LOG_KEY, JSON.stringify(list.slice(0, LOG_MAX))); return true; } catch { return false; } }
+function logAdd(doc){
+  const id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
+  return logWrite([{ ...doc, id }, ...logRead()]);
+}
 let rows = [];
-async function loadLog(){
+function loadLog(){
   $("#detail").innerHTML = ""; $("#list").hidden = false;
-  try { rows = await api("/api/analyses"); $("#dbNote").hidden = true; }
-  catch (e) { $("#dbNote").hidden = false; $("#dbNote").textContent = "טעינת היומן נכשלה (" + e.message + ")."; return; }
-  if (!rows.length) { $("#list").innerHTML = `<p class="hint">עוד אין ניתוחים שמורים. ניתוח במצב "אמיתי" או "תרחיש מראש" נשמר כאן אוטומטית, עם מקום לרשום מה קרה בפועל.</p>`; return; }
-  $("#list").innerHTML = rows.map(r => `<button class="item" data-id="${esc(r.id)}">
-    <span class="m">${esc(r.createdAt?.slice(0,10))} · ${esc(MODE_HE[r.mode]||r.mode)} · ${esc(r.s1?.label||"")}${r.outcome ? " · ✓ תוצאה" : ""}</span>
-    <span class="t">${esc(r.s1?.summary || r.event?.slice(0,120))}</span>
-    <span class="m" style="direction:ltr;text-align:right">${(r.stocks||[]).map(s=>esc(s.ticker)).join(" ")}</span></button>`).join("");
+  rows = logRead().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  const tools = `<div class="row" style="margin-bottom:8px"><button class="btn ghost" type="button" id="exp">ייצוא לקובץ</button>
+    <label class="btn ghost">ייבוא מקובץ<input type="file" id="imp" accept="application/json,.json" hidden></label>
+    <span class="hint" id="ioSt"></span></div>`;
+  $("#list").innerHTML = tools + (rows.length ? rows.map(r => `<button class="item" data-id="${esc(r.id)}">
+    <span class="m">${esc(String(r.createdAt||"").slice(0,10))} · ${esc(MODE_HE[r.mode]||r.mode)} · ${esc(r.s1?.label||"")}${r.outcome ? " · ✓ תוצאה" : ""}</span>
+    <span class="t">${esc(r.s1?.summary || String(r.event||"").slice(0,120))}</span>
+    <span class="m" style="direction:ltr;text-align:right">${(r.stocks||[]).map(s=>esc(s.ticker)).join(" ")}</span></button>`).join("")
+    : `<p class="hint">עוד אין ניתוחים שמורים. ניתוח במצב "אמיתי" או "תרחיש מראש" נשמר כאן אוטומטית, עם מקום לרשום מה קרה בפועל. היומן נשמר בדפדפן הזה; כדי להעביר אותו למכשיר אחר השתמש בייצוא ובייבוא.</p>`);
   $("#list").querySelectorAll(".item").forEach(b => b.onclick = () => openDetail(b.dataset.id));
+  $("#exp").onclick = () => {
+    const blob = new Blob([JSON.stringify(logRead(), null, 1)], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = `event-map-log-${new Date().toISOString().slice(0,10)}.json`; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+  $("#imp").onchange = async e => {
+    const f = e.target.files?.[0]; if (!f) return;
+    try {
+      const incoming = JSON.parse(await f.text());
+      if (!Array.isArray(incoming)) throw new Error();
+      const have = new Set(logRead().map(r => r.id));
+      const add = incoming.filter(r => r && typeof r === "object" && typeof r.id === "string" && !have.has(r.id));
+      if (!logWrite([...add, ...logRead()])) throw new Error();
+      loadLog(); $("#ioSt").textContent = `יובאו ${add.length} ניתוחים.`;
+    } catch { $("#ioSt").textContent = "הקובץ לא תקין."; }
+  };
 }
 function openDetail(id){
   const r = rows.find(x => x.id === id); if (!r) return;
@@ -239,17 +289,17 @@ function openDetail(id){
     <div class="row"><button class="btn" id="saveOut">שמור תוצאה</button><span class="hint" id="outSt"></span></div></div>`;
   renderResult(r, $("#dres"));
   $("#list").hidden = true;
-  $("#back").onclick = () => { host.innerHTML = ""; $("#list").hidden = false; };
-  $("#del").onclick = async () => {
+  $("#back").onclick = loadLog;
+  $("#del").onclick = () => {
     if (!confirm("למחוק את הניתוח מהיומן?")) return;
-    try { await api("/api/analyses/" + encodeURIComponent(id), { method: "DELETE" }); loadLog(); }
-    catch (e) { $("#outSt").textContent = "המחיקה נכשלה: " + e.message; }
+    logWrite(logRead().filter(x => x.id !== id)); loadLog();
   };
-  $("#saveOut").onclick = async () => {
-    const b = $("#saveOut"); b.disabled = true; $("#outSt").textContent = "שומר…";
-    try { const row = await api("/api/analyses/" + encodeURIComponent(id), { method: "PATCH", body: JSON.stringify({ outcome: $("#outc").value }) }); Object.assign(r, row); $("#outSt").textContent = "נשמר."; }
-    catch (e) { $("#outSt").textContent = "השמירה נכשלה: " + e.message; }
-    b.disabled = false;
+  $("#saveOut").onclick = () => {
+    const list = logRead(), row = list.find(x => x.id === id);
+    if (!row) { $("#outSt").textContent = "הניתוח לא נמצא."; return; }
+    row.outcome = $("#outc").value; row.outcomeAt = new Date().toISOString();
+    if (logWrite(list)) { r.outcome = row.outcome; $("#outSt").textContent = "נשמר."; }
+    else $("#outSt").textContent = "השמירה נכשלה.";
   };
 }
 

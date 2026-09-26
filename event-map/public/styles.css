@@ -104,3 +104,4 @@ a{color:var(--accent)}
 .src{font-size:12px;direction:ltr;text-align:left;margin:4px 0 0;padding-inline-start:18px}
 .src li{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .newsbar{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}
+.locked nav.tabs,.locked section{display:none!important}
