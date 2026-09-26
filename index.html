@@ -803,6 +803,12 @@ body{font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
 const GOOGLE_CLIENT_ID = '187048911336-u7sget9mjlsdqpang5oraafmintt1ses.apps.googleusercontent.com';
 let googleInitialized = false;
 
+// Everything below that builds HTML from scan results, products or the Google profile
+// goes through these: that data is not ours (AI output, third-party APIs, localStorage).
+function esc(s){ return String(s==null?'':s).replace(/[&<>"'`]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c])); }
+function safeUrl(u){ try { const x=new URL(String(u), location.href); return (x.protocol==='https:'||x.protocol==='http:') ? esc(x.href) : '#'; } catch(e){ return '#'; } }
+function safeColor(c, d){ return /^#[0-9a-fA-F]{3,8}$/.test(String(c)) ? c : (d||'#888888'); }
+
 function initGoogleSignIn() {
   if (typeof google === 'undefined' || !GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') return;
   if (googleInitialized) return;
@@ -864,11 +870,11 @@ function updateProfileSheet(user) {
   const psSignedIn = document.getElementById('psSignedIn');
   if (user && user.email) {
     if (user.picture) {
-      psAvatar.innerHTML = '<img src="'+user.picture+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+      psAvatar.innerHTML = '<img src="'+safeUrl(user.picture)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
     } else {
       psAvatar.textContent = (user.name || user.email)[0].toUpperCase();
     }
-    psNameRow.innerHTML = '<div class="ps-name">'+(user.name||'')+'</div><div class="ps-email">'+user.email+'</div>';
+    psNameRow.innerHTML = '<div class="ps-name">'+esc(user.name||'')+'</div><div class="ps-email">'+esc(user.email)+'</div>';
     psGoogleWrap.style.display = 'none';
     psSignedIn.style.display = 'block';
   } else {
@@ -916,7 +922,7 @@ function applyUserToUI(user) {
   if (greeting) greeting.textContent = firstName ? 'שלום, ' + firstName : 'שלום';
   if (avatar) {
     if (user.picture) {
-      avatar.innerHTML = '<img src="' + user.picture + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
+      avatar.innerHTML = '<img src="' + safeUrl(user.picture) + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover">';
     } else {
       avatar.textContent = firstName ? firstName[0].toUpperCase() : '?';
     }
@@ -1189,6 +1195,7 @@ function startSnapScan(base64,mimeType){
   if(base64){
     fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:base64,mimeType:mimeType})})
       .then(r=>{
+        if(r.status===429) throw new Error('הגעת למגבלת הסריקות. נסה שוב בעוד שעה.');
         if(!r.ok) throw new Error('שרת החזיר שגיאה ('+r.status+'). נסה שוב.');
         return r.json();
       })
@@ -1270,8 +1277,8 @@ function showSnapDetected(){
       ?`<button class="item-row-add added" id="add-btn-${item.id}" onclick="event.stopPropagation();addToWardrobe(${item.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>`
       :`<button class="item-row-add" id="add-btn-${item.id}" onclick="event.stopPropagation();addToWardrobe(${item.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--caramel)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>`;
     list.innerHTML+=`<div class="item-row" onclick="showSnapProducts(${item.id})">
-      <div class="swatch-wrap"><div class="swatch" style="background:${item.hex}"></div><span class="cat-ico">${ico}</span></div>
-      <div class="item-info"><div class="item-name-row"><span class="iname">${item.type}</span><span class="cbadge ${cls}">${pct}%</span></div><div class="imeta">${meta}</div></div>
+      <div class="swatch-wrap"><div class="swatch" style="background:${safeColor(item.hex)}"></div><span class="cat-ico">${ico}</span></div>
+      <div class="item-info"><div class="item-name-row"><span class="iname">${esc(item.type)}</span><span class="cbadge ${cls}">${pct}%</span></div><div class="imeta">${esc(meta)}</div></div>
       <div class="shop-ico">🛍️</div>${btnHtml}
     </div>`;
   });
@@ -1299,11 +1306,11 @@ function renderRecentFinds(){
   sec.style.display='block';
   scroll.innerHTML=recentScans.slice(0,8).map(item=>`
     <div class="rcard">
-      <div class="rcard-img" style="background:${item.hex}20;display:flex;align-items:center;justify-content:center;">
-        <div style="width:28px;height:28px;border-radius:50%;background:${item.hex}"></div>
+      <div class="rcard-img" style="background:${safeColor(item.hex)}20;display:flex;align-items:center;justify-content:center;">
+        <div style="width:28px;height:28px;border-radius:50%;background:${safeColor(item.hex)}"></div>
       </div>
-      <div class="rcard-name">${item.name}</div>
-      <div class="rcard-price" style="color:var(--muted);font-size:9px">${[item.color,item.brand].filter(Boolean).join(' · ')||'&nbsp;'}</div>
+      <div class="rcard-name">${esc(item.name)}</div>
+      <div class="rcard-price" style="color:var(--muted);font-size:9px">${esc([item.color,item.brand].filter(Boolean).join(' · '))||'&nbsp;'}</div>
     </div>`).join('');
 }
 
@@ -1355,31 +1362,31 @@ function renderRealProducts(products,item){
   var labels=['⭐ הכי מתאים','🔄 חלופה'];
   document.getElementById('snapTopGrid').innerHTML=top.map(function(p,i){
     var imgHtml=p.image
-      ?'<img src="'+p.image+'" alt="'+p.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px" onerror="this.style.display=\'none\'">'
+      ?'<img src="'+safeUrl(p.image)+'" alt="'+esc(p.name)+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px" onerror="this.style.display=\'none\'">'
       :'<span style="font-size:28px">👕</span>';
-    var stars=p.rating?'<span style="color:#f59e0b;font-size:10px">★ '+p.rating+'</span> ':'';
+    var stars=p.rating?'<span style="color:#f59e0b;font-size:10px">★ '+esc(p.rating)+'</span> ':'';
     return'<div class="store-card" style="position:relative">'+
       '<div class="store-card-badge">'+labels[i]+'</div>'+
       '<div class="store-card-logo" style="background:var(--caramel-light);overflow:hidden">'+imgHtml+'</div>'+
       '<div class="store-card-info">'+
-        '<div class="store-card-name">'+p.name.substring(0,40)+(p.name.length>40?'…':'')+'</div>'+
-        '<div class="store-card-desc">'+p.store+(p.rating?' · '+stars:'')+'</div>'+
-        '<div class="store-card-price">'+(p.price||'')+'</div>'+
+        '<div class="store-card-name">'+esc(String(p.name).substring(0,40))+(String(p.name).length>40?'…':'')+'</div>'+
+        '<div class="store-card-desc">'+esc(p.store)+(p.rating?' · '+stars:'')+'</div>'+
+        '<div class="store-card-price">'+esc(p.price||'')+'</div>'+
       '</div>'+
-      '<a href="'+p.url+'" target="_blank"><button class="store-card-btn">לרכישה ↗</button></a>'+
+      '<a href="'+safeUrl(p.url)+'" target="_blank" rel="noopener noreferrer"><button class="store-card-btn">לרכישה ↗</button></a>'+
     '</div>';
   }).join('');
   document.getElementById('snapMoreGrid').innerHTML=more.map(function(p){
     var imgHtml=p.image
-      ?'<img src="'+p.image+'" alt="'+p.name+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'">'
+      ?'<img src="'+safeUrl(p.image)+'" alt="'+esc(p.name)+'" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'">'
       :'<span style="font-size:20px">👕</span>';
-    return'<a href="'+p.url+'" target="_blank" style="text-decoration:none">'+
+    return'<a href="'+safeUrl(p.url)+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none">'+
       '<div class="pmini">'+
         '<div class="pmini-img" style="overflow:hidden">'+imgHtml+'</div>'+
         '<div class="pmini-body">'+
-          '<div class="pmini-name">'+p.name.substring(0,30)+(p.name.length>30?'…':'')+'</div>'+
-          '<div class="pmini-store">'+p.store+'</div>'+
-          '<div class="pmini-price">'+(p.price||'חפש ↗')+'</div>'+
+          '<div class="pmini-name">'+esc(String(p.name).substring(0,30))+(String(p.name).length>30?'…':'')+'</div>'+
+          '<div class="pmini-store">'+esc(p.store)+'</div>'+
+          '<div class="pmini-price">'+esc(p.price||'חפש ↗')+'</div>'+
         '</div>'+
       '</div>'+
     '</a>';
@@ -1400,7 +1407,7 @@ function renderStoreFallback(item){
       '</div>'+
       '<div class="store-card-info">'+
         '<div class="store-card-name">'+s.name+'</div>'+
-        '<div class="store-card-desc">'+item.type+(item.color?' · '+item.color:'')+'</div>'+
+        '<div class="store-card-desc">'+esc(item.type)+(item.color?' · '+esc(item.color):'')+'</div>'+
         '<div class="store-card-price">חיפוש חי ↗</div>'+
       '</div>'+
       '<a href="'+s.url(q)+'" target="_blank"><button class="store-card-btn">חפש ↗</button></a>'+
@@ -1413,7 +1420,7 @@ function renderStoreFallback(item){
           '<span style="font-size:18px">'+s.emoji+'</span><span style="font-size:9px">'+s.name+'</span>'+
         '</div>'+
         '<div class="pmini-body">'+
-          '<div class="pmini-name">'+item.type+'</div>'+
+          '<div class="pmini-name">'+esc(item.type)+'</div>'+
           '<div class="pmini-store">'+s.name+'</div>'+
           '<div class="pmini-price">חפש ↗</div>'+
         '</div>'+
@@ -1511,10 +1518,10 @@ function renderSocialChips(){
   document.getElementById('socialChips').innerHTML=socialItems.map(item=>`
     <div class="chip${item.id===socialActive?' active':''}" id="chip-${item.id}" onclick="selSocial(${item.id})">
       <div class="chip-num">${item.n}</div>
-      <div class="chip-color" style="background:${item.hex||item.color||'#C4956A'}"></div>
+      <div class="chip-color" style="background:${safeColor(item.hex,'#C4956A')}"></div>
       <div class="chip-info">
-        <div class="chip-name">${item.type||item.name}</div>
-        <div class="chip-sub">${[item.color,item.brand].filter(Boolean).join(' · ')||item.sub||''}</div>
+        <div class="chip-name">${esc(item.type||item.name)}</div>
+        <div class="chip-sub">${esc([item.color,item.brand].filter(Boolean).join(' · ')||item.sub||'')}</div>
       </div>
     </div>`).join('');
 }
@@ -1523,7 +1530,7 @@ function renderSocialShop(id){
   const item=socialItems.find(i=>i.id===id);if(!item)return;
   const shopEl=document.getElementById('socialShop');
   shopEl.innerHTML=
-    '<div class="shop-lbl">פריט '+item.n+' <span>· '+(item.type||item.name)+'</span></div>'+
+    '<div class="shop-lbl">פריט '+esc(item.n)+' <span>· '+esc(item.type||item.name)+'</span></div>'+
     '<div id="socialProdGrid" style="margin-top:8px"><div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">מחפש מוצרים...</div></div>'+
     '<button class="stl-btn" style="margin-top:12px" onclick="shopFullLook()">Shop the Full Look</button>';
   fetch('/api/products',{method:'POST',headers:{'Content-Type':'application/json'},
@@ -1533,11 +1540,11 @@ function renderSocialShop(id){
     const grid=document.getElementById('socialProdGrid');if(!grid)return;
     if(!data.products||data.products.length===0){grid.innerHTML=renderSocialStoreFallback(item);return;}
     grid.innerHTML='<div class="prod-g3">'+data.products.slice(0,3).map(p=>{
-      const img=p.image?`<img src="${p.image}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:'';
-      return`<a href="${p.url}" target="_blank" style="text-decoration:none">
+      const img=p.image?`<img src="${safeUrl(p.image)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`:'';
+      return`<a href="${safeUrl(p.url)}" target="_blank" rel="noopener noreferrer" style="text-decoration:none">
         <div class="prd"><div class="prd-img" style="overflow:hidden">${img}</div>
-        <div class="prd-bd"><div class="prd-nm">${p.name.substring(0,28)}${p.name.length>28?'…':''}</div>
-        <div class="prd-st">${p.store}</div><div class="prd-pr">${p.price||'חפש ↗'}</div></div></div></a>`;
+        <div class="prd-bd"><div class="prd-nm">${esc(String(p.name).substring(0,28))}${String(p.name).length>28?'…':''}</div>
+        <div class="prd-st">${esc(p.store)}</div><div class="prd-pr">${esc(p.price||'חפש ↗')}</div></div></div></a>`;
     }).join('')+'</div>';
   })
   .catch(()=>{const grid=document.getElementById('socialProdGrid');if(grid)grid.innerHTML=renderSocialStoreFallback(item);});
@@ -1549,7 +1556,7 @@ function renderSocialStoreFallback(item){
     `<a href="${s.url(q)}" target="_blank" style="text-decoration:none">
       <div class="prd"><div class="prd-img" style="background:${s.bg};color:${s.fg};flex-direction:column;gap:2px">
         <span style="font-size:18px">${s.emoji}</span><span style="font-size:8px;font-weight:700">${s.name}</span>
-      </div><div class="prd-bd"><div class="prd-nm">${item.type||item.name}</div>
+      </div><div class="prd-bd"><div class="prd-nm">${esc(item.type||item.name)}</div>
       <div class="prd-st">${s.name}</div><div class="prd-pr">חפש ↗</div></div></div></a>`
   ).join('')+'</div>';
 }
@@ -1699,18 +1706,18 @@ function renderWardrobe(filter){
     default:`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H5v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10h1.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>`,
   };
   grid.innerHTML=filtered.map(item=>{
-    const hex=item.hex||'#C4956A';
-    const iconColor=item.hex?shadeHex(item.hex,-40):'#7a5530';
+    const hex=safeColor(item.hex,'#C4956A');
+    const iconColor=item.hex?shadeHex(hex,-40):'#7a5530';
     const svg=catSvg[item.cat]||catSvg.default;
     const imgContent = item.image
-      ? `<img src="${item.image}" style="width:100%;height:100%;object-fit:contain;position:absolute;inset:0;" onerror="this.style.display='none'">`
+      ? `<img src="${safeUrl(item.image)}" style="width:100%;height:100%;object-fit:contain;position:absolute;inset:0;" onerror="this.style.display='none'">`
       : svg;
     const imgBg = item.image ? '' : `background:linear-gradient(145deg,${hex}33,${hex}66);`;
     return`<div class="witem">
       <div class="witem-img" style="${imgBg}color:${iconColor}">${imgContent}</div>
       <div class="witem-info">
-        <div class="witem-name">${item.name}</div>
-        <div class="witem-meta">${item.meta||''}</div>
+        <div class="witem-name">${esc(item.name)}</div>
+        <div class="witem-meta">${esc(item.meta||'')}</div>
       </div>
     </div>`;
   }).join('')+`
